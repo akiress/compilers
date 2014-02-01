@@ -125,6 +125,7 @@ id=({alphabet}|{digits}|"_")*
 <YYINITIAL>"/*" {comments++; yybegin(COMMENT);}
 <COMMENT>"/*" {comments++;}
 <COMMENT>{comment_text} {}
+<COMMENT>{whitespace}+ {}
 <COMMENT>"*/" {if (--comments == 0) {yybegin(YYINITIAL); }}
 
 <SPACE>{whitespace}+ {}
