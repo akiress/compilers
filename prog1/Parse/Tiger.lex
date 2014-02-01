@@ -129,7 +129,7 @@ id=({alphabet}|{digits}|"_")*
 <STRING>"\t" {string.append("\t");}
 <STRING>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings = 0; return tok(sym.STRING, string.toString());}
-<STRING>{newline} {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals."); yybegin(STRING_IGNORE);}
+<STRING>{newline} {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\' to continue to another line"); yybegin(STRING_IGNORE);}
 <STRING>\\{whitespace} {yybegin(SPACE);}
 <STRING>\\"\n" {newline(); yybegin(SPACE);}
 

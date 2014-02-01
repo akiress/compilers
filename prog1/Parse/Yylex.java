@@ -648,7 +648,7 @@ private int [][] unpackFromString(int size1, int size2, String st)
 					case -51:
 						break;
 					case 51:
-						{lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals."); yybegin(STRING_IGNORE);}
+						{lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\' to continue to another line"); yybegin(STRING_IGNORE);}
 					case -52:
 						break;
 					case 52:
