@@ -10,6 +10,7 @@ import ErrorMsg.ErrorMsg;
 %line
 %state COMMENT
 %state STRING
+%state SPACE
 
 %{
 private int comments = 0;
@@ -51,11 +52,13 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
         }
 %eofval}       
 
-whitespace=[\n\ \t\b\012]
 alphabet=[a-zA-Z]
-digits=[0-9]+
+digits=[0-9]
+nonnewline_white_space=[\ \t\b\012]
+whitespace=[\n\ \t\b\012]
+string_text=(\\\"|[^\n\"]|\\{whitespace}+\\)*
+comment_text=([^/*\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
 id=({alphabet}|{digits}|"_")*
-comment=([^/*\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
 
 %%
 while {return tok(sym.WHILE, null);}
@@ -76,7 +79,7 @@ do {return tok(sym.DO, null);}
 of {return tok(sym.OF, null);}
 nil {return tok(sym.NIL, null);}
 
-" "	{}
+{nonnewline_white_space}+ {}
 \n	{newline();}
 ","	{return tok(sym.COMMA, null);}
 ":" {return tok(sym.COLON, null);}
@@ -103,11 +106,23 @@ nil {return tok(sym.NIL, null);}
 ":=" {return tok(sym.ASSIGN, null);}
 
 {id} {return tok(sym.ID, yytext());}
-{digits} {return tok(sym.INT, Integer.parseInt(yytext()));}
+{digits}+ {return tok(sym.INT, Integer.parseInt(yytext()));}
+
+{alphabet} {text.append(yytext());}
+\\\"|\\\\ {text.append(yytext().charAt(1));}
+"\n"    {text.append("\n");}
+"\t"    {text.append("\t");}
+"\^"[a-z] {text.append((char) (yytext().charAt(2) - 'a' + 1));}
+"\^"    {System.err.println("Aviso: caracteres \\^ isolados " +
+       "em string");}
+"\""    {yybegin(YYINITIAL); stringlit = 0;
+       return tok(sym.STRING, text.toString());}
+\\{nonnewline_white_space} {yybegin(SPACE);}
+\\"\n"    {newline(); yybegin(SPACE);}
 
 "/*" {comments++; yybegin(COMMENT);}
 <COMMENT>"/*" {comments++;}
-<COMMENT>{comment} { }
+<COMMENT>{comment_text} { }
 <COMMENT>"*/" {if (--comments == 0) {yybegin(YYINITIAL); }}
 
 . { err("Illegal character: " + yytext()); }
