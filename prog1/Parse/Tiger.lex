@@ -47,9 +47,9 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 %}
 
 %eofval{
-	{
-	 return tok(sym.EOF, null);
-        }
+{
+  return tok(sym.EOF, null);
+}
 %eofval}       
 
 alphabet=[a-zA-Z]
@@ -80,9 +80,9 @@ id=({alphabet}|{digits}|"_")*
 <YYINITIAL>nil {return tok(sym.NIL, null);}
 
 <YYINITIAL>{nonnewline_white_space}+ {}
-<YYINITIAL>\n	{newline();}
+<YYINITIAL>\n {newline();}
 
-<YYINITIAL>","	{return tok(sym.COMMA, null);}
+<YYINITIAL>"," {return tok(sym.COMMA, null);}
 <YYINITIAL>":" {return tok(sym.COLON, null);}
 <YYINITIAL>";" {return tok(sym.SEMICOLON, null);}
 
