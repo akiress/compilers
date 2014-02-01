@@ -11,22 +11,31 @@ import ErrorMsg.ErrorMsg;
 %state COMMENT
 %state STRING
 %state SPACE
+%state STRING_IGNORE
 
 %{
 private int comments;
 private int strings;
 private StringBuffer string;
+private int lineNum;
+private int linePos;
+private int charPos;
 
 private void newline() {
   errorMsg.newline(yychar);
 }
 
-private void err(int pos, String s) {
-  errorMsg.error(pos,s);
-}
+/* private void err(int pos, String s) {
+  errorMsg.error(pos, s);
+} */
 
 private void err(String s) {
-  err(yychar,s);
+  err(yychar, s);
+}
+
+/* Using custom error messages instead of changing ErrorMsg.java for project 1. Will change ErrorMsg.java later */
+private void err(int line, String s) {
+  System.err.println("ERROR: Line " + line + " : " + s);
 }
 
 private java_cup.runtime.Symbol tok(int kind) {
@@ -54,13 +63,17 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 
 alphabet=[a-zA-Z]
 digits=[0-9]
-nonnewline_white_space=[\ \t\b\012]
-whitespace=[\n\ \t\b\012]
-string_text=(\\\"|[^\n\"]|\\{whitespace}+\\)*
+whitespace=[\ \t\b\012]
+newline=\n
+ws=({whitespace}|{newline})
+string_text=(\\\"|[^\n\"]|\\{ws}+\\)*
 comment_text=([^/*\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
 id=({alphabet}|{digits}|"_")*
 
 %%
+<YYINITIAL>{whitespace}+ {}
+<YYINITIAL>{newline} {newline();}
+
 <YYINITIAL>while {return tok(sym.WHILE, null);}
 <YYINITIAL>for {return tok(sym.FOR, null);}
 <YYINITIAL>to {return tok(sym.TO, null);}
@@ -78,9 +91,6 @@ id=({alphabet}|{digits}|"_")*
 <YYINITIAL>do {return tok(sym.DO, null);}
 <YYINITIAL>of {return tok(sym.OF, null);}
 <YYINITIAL>nil {return tok(sym.NIL, null);}
-
-<YYINITIAL>{nonnewline_white_space}+ {}
-<YYINITIAL>\n {newline();}
 
 <YYINITIAL>"," {return tok(sym.COMMA, null);}
 <YYINITIAL>":" {return tok(sym.COLON, null);}
@@ -117,17 +127,29 @@ id=({alphabet}|{digits}|"_")*
 <STRING>\\\"|\\\\ {string.append(yytext().charAt(1));}
 <STRING>"\n" {string.append("\n");}
 <STRING>"\t" {string.append("\t");}
-<STRING>"\^"[a-z] {string.append((char) (yytext().charAt(2) - 'a' + 1));}
+<STRING>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings = 0; return tok(sym.STRING, string.toString());}
+<STRING>{newline} {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals."); yybegin(STRING_IGNORE);}
 <STRING>\\{whitespace} {yybegin(SPACE);}
 <STRING>\\"\n" {newline(); yybegin(SPACE);}
+
+<STRING_IGNORE>{string_text} {string.append(yytext());}
+<STRING_IGNORE>\\\"|\\\\ {string.append(yytext().charAt(1));}
+<STRING_IGNORE>"\n" {string.append("\n");}
+<STRING_IGNORE>"\t" {string.append("\t");}
+<STRING_IGNORE>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
+<STRING_IGNORE>"\"" {yybegin(YYINITIAL); strings = 0;}
+<STRING_IGNORE>{newline} {}
+<STRING_IGNORE>\\{whitespace} {yybegin(SPACE);}
+<STRING_IGNORE>\\"\n" {newline(); yybegin(SPACE);}
 
 <YYINITIAL>"/*" {comments++; yybegin(COMMENT);}
 <COMMENT>"/*" {comments++;}
 <COMMENT>{comment_text} {}
-<COMMENT>{whitespace}+ {}
+<COMMENT>{newline}+ {}
 <COMMENT>"*/" {if (--comments == 0) {yybegin(YYINITIAL); }}
 
 <SPACE>{whitespace}+ {}
 <SPACE>\\ {yybegin(STRING);}
-<SPACE>. { err("Illegal character: " + yytext()); }
+
+. {lineNum = yyline + 1;err(lineNum, "Illegal character: " + yytext()); }
