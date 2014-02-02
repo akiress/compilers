@@ -35,7 +35,7 @@ private void err(String s) {
 
 /* Using custom error messages instead of changing ErrorMsg.java for project 1. Will change ErrorMsg.java later */
 private void err(int line, String s) {
-  System.err.println("ERROR: Line " + line + " : " + s);
+  System.out.println("ERROR: Line " + line + " : " + s);
 }
 
 private java_cup.runtime.Symbol tok(int kind) {
@@ -64,7 +64,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 alphabet=[a-zA-Z]
 digits=[0-9]
 whitespace=[\ \t\b\012]
-newline=\n
+newline=[\n\r]
 ws=({whitespace}|{newline})
 string_text=(\\\"|[^\n\"]|\\{ws}+\\)*
 comment_text=([^/*\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
