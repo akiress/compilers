@@ -57,6 +57,8 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 
 %eofval{
 {
+  if (comments > 0) { err("ERROR: Unmatched starting comment.");}
+  if (comments < 0) { err("ERROR: Unmatched closing comment.");}
   return tok(sym.EOF, null);
 }
 %eofval}       
@@ -66,7 +68,7 @@ digits=[0-9]
 whitespace=[\ \t\b\012]
 newline=[\n\r]
 ws=({whitespace}|{newline})
-string_text=(\\\"|[^\n\"]|\\{ws}+\\)*
+string_text=[^\"\\\n]*
 comment_text=([^/*\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
 id=({alphabet}|{digits}|"_")*
 
