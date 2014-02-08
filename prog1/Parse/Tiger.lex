@@ -46,6 +46,12 @@ private java_cup.runtime.Symbol tok(int kind, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar, yychar+yylength(), value);
 }
 
+private char newlinePrint(int line, String s) {
+  int tmp = s.length();
+  char newChar = s.charAt(tmp - 1);
+  return newChar;
+}
+
 private ErrorMsg errorMsg;
 
 Yylex(java.io.InputStream s, ErrorMsg e) {
@@ -125,25 +131,26 @@ id=({alphabet}|{digits}|"_")*
 <YYINITIAL>{digits}+ {return tok(sym.INT, Integer.parseInt(yytext()));}
 
 <YYINITIAL>"\"" {string = new StringBuffer(); strings = 1; yybegin(STRING);}
+<STRING>{newline} {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\\' to continue to another line"); yybegin(STRING_IGNORE);}
 <STRING>{string_text} {string.append(yytext());}
-<STRING>\\\"|\\\\ {string.append(yytext().charAt(1));}
-<STRING>"\n" {string.append("\n");}
-<STRING>"\t" {string.append("\t");}
+<STRING>\\n {string.append("\n");}
+<STRING>\\t {string.append("\t");}
+<STRING>"\\\"" {string.append("\"");}
+<STRING>\\\\ {string.append("\\");}
+<STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(newlinePrint(lineNum, yytext()));}
 <STRING>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings = 0; return tok(sym.STRING, string.toString());}
-<STRING>{newline} {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\' to continue to another line"); yybegin(STRING_IGNORE);}
-<STRING>\\{whitespace} {yybegin(SPACE);}
-<STRING>\\"\n" {newline(); yybegin(SPACE);}
 
-<STRING_IGNORE>{string_text} {string.append(yytext());}
-<STRING_IGNORE>\\\"|\\\\ {string.append(yytext().charAt(1));}
-<STRING_IGNORE>"\n" {string.append("\n");}
-<STRING_IGNORE>"\t" {string.append("\t");}
-<STRING_IGNORE>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING_IGNORE>"\"" {yybegin(YYINITIAL); strings = 0;}
-<STRING_IGNORE>{newline} {}
-<STRING_IGNORE>\\{whitespace} {yybegin(SPACE);}
-<STRING_IGNORE>\\"\n" {newline(); yybegin(SPACE);}
+<STRING_IGNORE>{newline} {lineNum = yyline + 1; yybegin(STRING_IGNORE);}
+<STRING_IGNORE>{string_text} {string.append(yytext());}
+<STRING_IGNORE>\\n {string.append("\n");}
+<STRING_IGNORE>\\t {string.append("\t");}
+<STRING_IGNORE>"\\\"" {string.append("\"");}
+<STRING_IGNORE>\\\\ {string.append("\\");}
+<STRING_IGNORE>\\[\n|\t|\ |\f]+[^\\] {string.append(newlinePrint(lineNum, yytext())); err(lineNum, "Unclosed form feed" + yytext());}
+<STRING_IGNORE>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
+<STRING_IGNORE>"\"" {yybegin(YYINITIAL); strings = 0; return tok(sym.STRING, string.toString());}
 
 <YYINITIAL>"/*" {comments++; yybegin(COMMENT);}
 <COMMENT>"/*" {comments++;}
