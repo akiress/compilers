@@ -18,8 +18,7 @@ private int comments;
 private int strings;
 private StringBuffer string;
 private int lineNum;
-private int linePos;
-private int charPos;
+private int tempLineNo;
 
 private void newline() {
   errorMsg.newline(yychar);
@@ -30,7 +29,7 @@ private void newline() {
 } */
 
 private void err(String s) {
-  err(yychar, s);
+  System.out.println(s);
 }
 
 /* Using custom error messages instead of changing ErrorMsg.java for project 1. Will change ErrorMsg.java later */
@@ -65,18 +64,15 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 {
   if (comments > 0) { err("ERROR: Unmatched starting comment.");}
   if (comments < 0) { err("ERROR: Unmatched closing comment.");}
+  if (strings == 1) { err("ERROR: Unclosed string.");}
   return tok(sym.EOF, null);
 }
 %eofval}       
 
-alphabet=[a-zA-Z]
+whitespace=" "|\t|\f
 digits=[0-9]
-whitespace=[\ \t\b\012]
 newline=[\n\r]
 ws=({whitespace}|{newline})
-string_text=[^\"\\\n]*
-comment_text=([^/*\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
-id=({alphabet}|{digits}|"_")*
 
 %%
 <YYINITIAL>{whitespace}+ {}
@@ -127,36 +123,37 @@ id=({alphabet}|{digits}|"_")*
 <YYINITIAL>"|" {return tok(sym.OR, null);}
 <YYINITIAL>":=" {return tok(sym.ASSIGN, null);}
 
-<YYINITIAL>{id} {return tok(sym.ID, yytext());}
-<YYINITIAL>{digits}+ {return tok(sym.INT, Integer.parseInt(yytext()));}
+<YYINITIAL>[a-zA-Z][a-zA-Z0-9_]* {return tok(sym.ID, yytext());}
+<YYINITIAL>[0-9]+ {return tok(sym.INT, Integer.parseInt(yytext()));}
 
-<YYINITIAL>"\"" {string = new StringBuffer(); strings = 1; yybegin(STRING);}
+<YYINITIAL>"\"" {string = new StringBuffer(); strings = 1; tempLineNo = yyline + 1; yybegin(STRING);}
 <STRING>{newline} {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\\' to continue to another line"); yybegin(STRING_IGNORE);}
-<STRING>{string_text} {string.append(yytext());}
+<STRING>[^\"\\\n]* {string.append(yytext());}
 <STRING>\\n {string.append("\n");}
 <STRING>\\t {string.append("\t");}
 <STRING>"\\\"" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(newlinePrint(lineNum, yytext()));}
-<STRING>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
+<STRING>\\[0-9][0-9][0-9] {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings = 0; return tok(sym.STRING, string.toString());}
+<STRING>\\. {err(lineNum, "Illegal Escape Sequence" + yytext());}
 
-<STRING_IGNORE>"\"" {yybegin(YYINITIAL); strings = 0;}
-<STRING_IGNORE>{newline} {lineNum = yyline + 1; yybegin(STRING_IGNORE);}
-<STRING_IGNORE>{string_text} {string.append(yytext());}
-<STRING_IGNORE>\\n {string.append("\n");}
-<STRING_IGNORE>\\t {string.append("\t");}
-<STRING_IGNORE>"\\\"" {string.append("\"");}
-<STRING_IGNORE>\\\\ {string.append("\\");}
-<STRING_IGNORE>\\[\n|\t|\ |\f]+[^\\] {string.append(newlinePrint(lineNum, yytext())); err(lineNum, "Unclosed form feed" + yytext());}
-<STRING_IGNORE>{digits}{digits}{digits} {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
-<STRING_IGNORE>"\"" {yybegin(YYINITIAL); strings = 0; return tok(sym.STRING, string.toString());}
+<STRING_IGNORE>{newline} {strings = 1;}
+<STRING_IGNORE>[^\"\\\n]* {}
+<STRING_IGNORE>\\n {}
+<STRING_IGNORE>\\t {}
+<STRING_IGNORE>"\\\"" {}
+<STRING_IGNORE>\\\\ {}
+<STRING_IGNORE>\\[\n|\t|\ |\f]+[^\\] {}
+<STRING_IGNORE>\\[0-9][0-9][0-9] {}
+<STRING_IGNORE>"\"" {strings = 0;}
+<STRING_IGNORE>\\. {}
 
 <YYINITIAL>"/*" {comments++; yybegin(COMMENT);}
 <COMMENT>"/*" {comments++;}
-<COMMENT>{comment_text} {}
 <COMMENT>{newline}+ {}
 <COMMENT>"*/" {if (--comments == 0) {yybegin(YYINITIAL); }}
+<COMMENT>. {}
 
 <SPACE>{whitespace}+ {}
 <SPACE>\\ {yybegin(STRING);}
