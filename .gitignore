@@ -1,2 +1,4 @@
-pub/
 *.class
+classes/
+*.s
+gcc*

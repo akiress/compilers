@@ -1,0 +1,9 @@
+let
+    var N := 8
+    var O := 22
+    var P := "lets try this shit out"
+    var Q := 37
+    var R := "and \n \\n now"
+    var S := "and \t \\t \t now"
+    var T := "error time
+end

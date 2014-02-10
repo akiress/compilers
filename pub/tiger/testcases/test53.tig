@@ -1,0 +1,16 @@
+/* error: syntax error, nil should not be preceded by type-id.  */
+/* help me /* help me */ */
+let 
+    type rectype = {name:string, id:int}
+    print "help"
+    print "hello dog, \
+    how are you doing, \
+    i am fine!!"
+    print "will this still work? \
+    I don't know"
+    print "so why the hell \
+    won't you work in test53"
+    var a:= rectype nil
+in
+    a
+end

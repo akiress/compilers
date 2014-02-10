@@ -45,10 +45,19 @@ private java_cup.runtime.Symbol tok(int kind, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar, yychar+yylength(), value);
 }
 
-private char newlinePrint(int line, String s) {
+private String print(String s) {
   int tmp = s.length();
-  char newChar = s.charAt(tmp - 1);
-  return newChar;
+  for (int i = 0 ; i < tmp ; i++) {
+  System.out.println(i + s.charAt(i));
+  }
+  String newStr = s.substring(1, tmp);
+  return newStr;
+}
+
+private int counter(int line, String s) {
+  int tmp = s.length();
+  tmp = line + tmp;
+  return tmp;
 }
 
 private ErrorMsg errorMsg;
@@ -62,21 +71,15 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 
 %eofval{
 {
-  if (comments > 0) { err("ERROR: Unmatched starting comment.");}
-  if (comments < 0) { err("ERROR: Unmatched closing comment.");}
-  if (strings == 1) { err("ERROR: Unclosed string.");}
+  if (comments != 0) { err("ERROR: Unclosed comment.");}
+  if (strings != 0) { err("ERROR: Unclosed string.");}
   return tok(sym.EOF, null);
 }
 %eofval}       
 
-whitespace=" "|\t|\f
-digits=[0-9]
-newline=[\n\r]
-ws=({whitespace}|{newline})
-
 %%
-<YYINITIAL>{whitespace}+ {}
-<YYINITIAL>{newline} {newline();}
+<YYINITIAL>[" "|\t|\f]+ {}
+<YYINITIAL>[\n\r] {newline();}
 
 <YYINITIAL>while {return tok(sym.WHILE, null);}
 <YYINITIAL>for {return tok(sym.FOR, null);}
@@ -126,19 +129,19 @@ ws=({whitespace}|{newline})
 <YYINITIAL>[a-zA-Z][a-zA-Z0-9_]* {return tok(sym.ID, yytext());}
 <YYINITIAL>[0-9]+ {return tok(sym.INT, Integer.parseInt(yytext()));}
 
-<YYINITIAL>"\"" {string = new StringBuffer(); strings = 1; tempLineNo = yyline + 1; yybegin(STRING);}
-<STRING>{newline} {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\\' to continue to another line"); yybegin(STRING_IGNORE);}
-<STRING>[^\"\\\n]* {string.append(yytext());}
+<YYINITIAL>"\"" {string = new StringBuffer(); strings++; tempLineNo = yyline + 1; yybegin(STRING);}
+<STRING>[\n\r] {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
 <STRING>\\n {string.append("\n");}
 <STRING>\\t {string.append("\t");}
 <STRING>"\\\"" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
-<STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(newlinePrint(lineNum, yytext()));}
+<STRING>\\\n|\\\f|\\\r|\012|\013|\014|\015 {lineNum = counter(lineNum, yytext()); string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9] {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
-<STRING>"\"" {yybegin(YYINITIAL); strings = 0; return tok(sym.STRING, string.toString());}
-<STRING>\\. {err(lineNum, "Illegal Escape Sequence" + yytext());}
+<STRING>"\"" {yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
+<STRING>\\. {err(lineNum = yyline + 1, "Illegal escape sequence.");}
+<STRING>. {string.append(yytext());}
 
-<STRING_IGNORE>{newline} {strings = 1;}
+<STRING_IGNORE>[\n\r\f] {strings = 1;}
 <STRING_IGNORE>[^\"\\\n]* {}
 <STRING_IGNORE>\\n {}
 <STRING_IGNORE>\\t {}
@@ -147,15 +150,15 @@ ws=({whitespace}|{newline})
 <STRING_IGNORE>\\[\n|\t|\ |\f]+[^\\] {}
 <STRING_IGNORE>\\[0-9][0-9][0-9] {}
 <STRING_IGNORE>"\"" {strings = 0;}
-<STRING_IGNORE>\\. {}
+<STRING_IGNORE>\\. {string.append(yytext());}
 
 <YYINITIAL>"/*" {comments++; yybegin(COMMENT);}
 <COMMENT>"/*" {comments++;}
-<COMMENT>{newline}+ {}
+<COMMENT>[\n\r]+ {}
 <COMMENT>"*/" {if (--comments == 0) {yybegin(YYINITIAL); }}
 <COMMENT>. {}
 
-<SPACE>{whitespace}+ {}
+<SPACE>[" "|\t|\f]+ {}
 <SPACE>\\ {yybegin(STRING);}
 
-. {lineNum = yyline + 1;err(lineNum, "Illegal character: " + yytext()); }
+. {lineNum = yyline + 1; err(lineNum, "Illegal character: " + yytext()); }
