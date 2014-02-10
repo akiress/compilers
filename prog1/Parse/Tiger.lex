@@ -133,7 +133,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>[\n\r] {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
 <STRING>\\n {string.append("\n");}
 <STRING>\\t {string.append("\t");}
-<STRING>"\\\"" {string.append("\"");}
+<STRING>\\\" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
 <STRING>\\\n|\\\f|\\\r|\012|\013|\014|\015 {lineNum = counter(lineNum, yytext()); string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9] {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
