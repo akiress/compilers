@@ -15,11 +15,11 @@ let
     won't you work in test53"
     
     print "testing quotes \
-    \okay \" \\" \\\""
+    \okay \" \\""
 
     var a:= rectype nil
 
-    print "\89 + \93"
+    print "\089 + \093"
 in
     a
 end

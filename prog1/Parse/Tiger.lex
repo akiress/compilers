@@ -39,12 +39,14 @@ private java_cup.runtime.Symbol tok(int kind, Object value) {
 }
 
 private String print(String s) {
-  int tmp = s.length();
-  for (int i = 0 ; i < tmp ; i++) {
-  System.out.println(i + s.charAt(i));
-  }
-  String newStr = s.substring(1, tmp);
+  String newStr = s.substring(1, s.length());
   return newStr;
+}
+
+private char getASCII(String s) {
+  String ascii = s.substring(1, s.length());
+  int i = Integer.parseInt(ascii);
+  return (char)i;
 }
 
 private ErrorMsg errorMsg;
@@ -114,7 +116,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <YYINITIAL>":=" {return tok(sym.ASSIGN, null);}
 
 <YYINITIAL>[a-zA-Z][a-zA-Z0-9_]* {return tok(sym.ID, yytext());}
-<YYINITIAL>[0-9]+ {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char) i);} else {err("ASCII error");} yybegin(STRING);}
+<YYINITIAL>[0-9]+ {return tok(sym.INT, new Integer(yytext()));}
 
 <YYINITIAL>"\"" {string = new StringBuffer(); strings++; yybegin(STRING);}
 <STRING>[\n\r] {yyline++; err("Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
@@ -122,11 +124,9 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>\\t {string.append("\t");}
 <STRING>"\\\"" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
-<STRING>\\[\n|\t|\ |\f]+\\ {string.append(print(yytext()));}
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
-<STRING>\\[0-9][0-9][0-9] {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
+<STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); System.out.println(i); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
-<STRING>\\. {err(yyline++, "Illegal escape sequence.");}
 <STRING>. {string.append(yytext());}
 
 <STRING_IGNORE>[\n\r\f] {strings = 1;}
