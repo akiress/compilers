@@ -14,27 +14,20 @@ import ErrorMsg.ErrorMsg;
 %state STRING_IGNORE
 
 %{
-private int comments;
+private int commentDepth;
 private int strings;
 private StringBuffer string;
-private int lineNum;
-private int tempLineNo;
 
 private void newline() {
   errorMsg.newline(yychar);
 }
 
-/* private void err(int pos, String s) {
+private void err(int pos, String s) {
   errorMsg.error(pos, s);
-} */
-
-private void err(String s) {
-  System.out.println(s);
 }
 
-/* Using custom error messages instead of changing ErrorMsg.java for project 1. Will change ErrorMsg.java later */
-private void err(int line, String s) {
-  System.out.println("ERROR: Line " + line + " : " + s);
+private void err(String s) {
+  err(yychar, s);
 }
 
 private java_cup.runtime.Symbol tok(int kind) {
@@ -54,12 +47,6 @@ private String print(String s) {
   return newStr;
 }
 
-private int counter(int line, String s) {
-  int tmp = s.length();
-  tmp = line + tmp;
-  return tmp;
-}
-
 private ErrorMsg errorMsg;
 
 Yylex(java.io.InputStream s, ErrorMsg e) {
@@ -71,7 +58,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 
 %eofval{
 {
-  if (comments != 0) { err("ERROR: Unclosed comment.");}
+  if (commentDepth != 0) { err("ERROR: Unclosed comment.");}
   if (strings != 0) { err("ERROR: Unclosed string.");}
   return tok(sym.EOF, null);
 }
@@ -127,19 +114,19 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <YYINITIAL>":=" {return tok(sym.ASSIGN, null);}
 
 <YYINITIAL>[a-zA-Z][a-zA-Z0-9_]* {return tok(sym.ID, yytext());}
-<YYINITIAL>[0-9]+ {return tok(sym.INT, Integer.parseInt(yytext()));}
+<YYINITIAL>[0-9]+ {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char) i);} else {err("ASCII error");} yybegin(STRING);}
 
-<YYINITIAL>"\"" {string = new StringBuffer(); strings++; tempLineNo = yyline + 1; yybegin(STRING);}
-<STRING>[\n\r] {lineNum = yyline + 1; err(lineNum, "Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
+<YYINITIAL>"\"" {string = new StringBuffer(); strings++; yybegin(STRING);}
+<STRING>[\n\r] {yyline++; err("Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
 <STRING>\\n {string.append("\n");}
 <STRING>\\t {string.append("\t");}
-<STRING>\\\" {string.append("\"");}
+<STRING>"\\\"" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
-<STRING>\\\\n\\ {string.append(print(yytext()));}
-<STRING>\\\n|\\\f|\\\r|\012|\013|\014|\015 {lineNum = counter(lineNum, yytext()); string.append(print(yytext()));}
+<STRING>\\[\n|\t|\ |\f]+\\ {string.append(print(yytext()));}
+<STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9] {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
-<STRING>\\. {err(lineNum = yyline + 1, "Illegal escape sequence.");}
+<STRING>\\. {err(yyline++, "Illegal escape sequence.");}
 <STRING>. {string.append(yytext());}
 
 <STRING_IGNORE>[\n\r\f] {strings = 1;}
@@ -153,13 +140,13 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING_IGNORE>"\"" {strings = 0;}
 <STRING_IGNORE>\\. {string.append(yytext());}
 
-<YYINITIAL>"/*" {comments++; yybegin(COMMENT);}
-<COMMENT>"/*" {comments++;}
+<YYINITIAL>"/*" {commentDepth++; yybegin(COMMENT);}
+<COMMENT>"/*" {commentDepth++;}
 <COMMENT>[\n\r]+ {}
-<COMMENT>"*/" {if (--comments == 0) {yybegin(YYINITIAL); }}
+<COMMENT>"*/" {if (--commentDepth == 0) {yybegin(YYINITIAL); }}
 <COMMENT>. {}
 
 <SPACE>[" "|\t|\f]+ {}
 <SPACE>\\ {yybegin(STRING);}
 
-. {lineNum = yyline + 1; err(lineNum, "Illegal character: " + yytext()); }
+. {yyline++; err("Illegal character: " + yytext()); }
