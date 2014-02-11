@@ -135,7 +135,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>\\t {string.append("\t");}
 <STRING>\\\" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
-<STRING>\\\\n\\ {string.append(print(yytext());}
+<STRING>\\\\n\\ {string.append(print(yytext()));}
 <STRING>\\\n|\\\f|\\\r|\012|\013|\014|\015 {lineNum = counter(lineNum, yytext()); string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9] {int i = Integer.parseInt(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
