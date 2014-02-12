@@ -39,6 +39,12 @@ private char getASCII(String s) {
   int i = Integer.parseInt(ascii);
   return (char)i;
 }
+private int getASCIInon(String s) {
+  int i = Character.getNumericValue(s.charAt(2));
+  i = i - 9;
+  System.out.println((char)i + " = " + i);
+  return i;
+}
 private int adjust(int pos, String s) {
   int i = s.length();
   int j = pos + i;
@@ -712,9 +718,9 @@ private int [][] unpackFromString(int size1, int size2, String st)
 					case 59:
 						{
   System.out.println("CONTROL: " + yytext());
-  String ascii = yytext().substring(1, yytext().length());
-  int i = Integer.parseInt(ascii);
-  System.out.println("CONTROL: " + (char)i);
+  int i = getASCIInon(yytext());
+  System.out.println(i);
+  string.append((char)i);
 }
 					case -60:
 						break;

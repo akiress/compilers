@@ -21,9 +21,9 @@ let
     var b := 25
     var c := -25
 
-    print "\089 + \093"
+    print "\089 + \093 + \067"
 
-    print "\^@ + \^A"
+    print "\^C + \^A"
 in
     a
 end

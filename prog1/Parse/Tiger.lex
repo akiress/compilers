@@ -49,6 +49,13 @@ private char getASCII(String s) {
   return (char)i;
 }
 
+private int getASCIInon(String s) {
+  int i = Character.getNumericValue(s.charAt(2));
+  i = i - 9;
+  System.out.println((char)i + " = " + i);
+  return i;
+}
+
 private int adjust(int pos, String s) {
   int i = s.length();
   int j = pos + i;
@@ -138,9 +145,9 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>\\\\ {string.append("\\");}
 <STRING>"\^"[@A-Z\[\\\]\^_?] {
   System.out.println("CONTROL: " + yytext());
-  String ascii = yytext().substring(1, yytext().length());
-  int i = Integer.parseInt(ascii);
-  System.out.println("CONTROL: " + (char)i);
+  int i = getASCIInon(yytext());
+  System.out.println(i);
+  string.append((char)i);
 }
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); System.out.println(i); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
