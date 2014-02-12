@@ -38,9 +38,10 @@ private java_cup.runtime.Symbol tok(int kind, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar, yychar+yylength(), value);
 }
 
-private String print(String s) {
-  String newStr = s.substring(1, s.length());
-  return newStr;
+private char print(String s) {
+  int tmp = s.length();
+  char newChar = s.charAt(tmp - 1);
+  return newChar;
 }
 
 private char getASCII(String s) {
@@ -49,22 +50,9 @@ private char getASCII(String s) {
   return (char)i;
 }
 
-private int getASCIInon(String s) {
+private int getControl(String s) {
   int i = Character.getNumericValue(s.charAt(2));
   i = i - 9;
-  System.out.println((char)i + " = " + i);
-  return i;
-}
-
-private int adjust(int pos, String s) {
-  int i = s.length();
-  int j = pos + i;
-  return j;
-}
-
-private int printControl(String s) {
-  int i = s.length();
-  String a = s.substring(1, i);
   return i;
 }
 
@@ -142,15 +130,12 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>\\n {string.append("\n");}
 <STRING>\\t {string.append("\t");}
 <STRING>\\\" {string.append("\"");}
-<STRING>\\\\ {string.append("\\");}
-<STRING>"\^"[@A-Z\[\\\]\^_?] {
-  System.out.println("CONTROL: " + yytext());
-  int i = getASCIInon(yytext());
-  System.out.println(i);
-  string.append((char)i);
-}
+<STRING>\\\\ {string.append(yytext());}
+<STRING>\\\\ {yybegin(STRING);}
+<STRING>[$\\\n^\\] {}
+<STRING>"\^"[@A-Z\[\\\]\^_?] {int i = getControl(yytext()); string.append((char)i);}
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
-<STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); System.out.println(i); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
+<STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
 <STRING>. {string.append(yytext());}
 
@@ -163,7 +148,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING_IGNORE>\\[\n|\t|\ |\f]+[^\\] {}
 <STRING_IGNORE>\\[0-9][0-9][0-9] {}
 <STRING_IGNORE>"\"" {strings = 0;}
-<STRING_IGNORE>\\. {string.append(yytext());}
+<STRING_IGNORE>\\. {}
 
 <YYINITIAL>"/*" {commentDepth++; yybegin(COMMENT);}
 <COMMENT>"/*" {commentDepth++;}

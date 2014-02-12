@@ -4,17 +4,17 @@ let
     type rectype = {name:string, id:int}
     print "help"
 
-    print "hello dog, \
-    how are you doing, \
-    i am fine!!"
+    print "hello dog,\
+    \how are you doing,\
+    \i am fine!!"
 
-    print "will this still work? \
-    	I don't know"
+    print "will this still work?\
+    \I don't know"
 
-    print "so why the hell \
-    won't you work in test53"
+    print "so why the hell\
+    \won't you work in test53"
     
-    print "testing quotes \
+    print "testing quotes\
     \okay \" \\\" "
 
     var a:= rectype nil
