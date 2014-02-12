@@ -17,13 +17,17 @@ let
     print "testing quotes\
     \okay \" \\\" "
 
+    print "icky\
+    \ foo\
+    \ bar"
+
     var a:= rectype nil
     var b := 25
     var c := -25
 
     print "\089 + \093 + \067"
 
-    print "\^C + \^A"
+    print "\^A, \^B, \^C, \^D, \^E, \^F, \^G"
 in
     a
 end

@@ -15,6 +15,8 @@ class Yylex implements Lexer {
 private int commentDepth;
 private int strings;
 private StringBuffer string;
+private int charPos;
+private int tempCharPos;
 private void newline() {
   errorMsg.newline(yychar);
 }
@@ -30,9 +32,14 @@ private java_cup.runtime.Symbol tok(int kind) {
 private java_cup.runtime.Symbol tok(int kind, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar, yychar+yylength(), value);
 }
+private java_cup.runtime.Symbol tok(int kind, int pos, Object value) {
+    return new java_cup.runtime.Symbol(kind, yychar-pos, yychar+yylength(), value);
+}
 private char print(String s) {
   int tmp = s.length();
   char newChar = s.charAt(tmp - 1);
+  charPos = s.length() + yychar;
+  System.out.println(charPos);
   return newChar;
 }
 private char getASCII(String s) {
@@ -683,11 +690,11 @@ private int [][] unpackFromString(int size1, int size2, String st)
 					case -53:
 						break;
 					case 53:
-						{yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
+						{yybegin(YYINITIAL); strings--; tempCharPos = 0; return tok(sym.STRING, charPos, string.toString());}
 					case -54:
 						break;
 					case 54:
-						{}
+						{charPos++;}
 					case -55:
 						break;
 					case 55:
@@ -779,7 +786,7 @@ private int [][] unpackFromString(int size1, int size2, String st)
 					case -77:
 						break;
 					case 78:
-						{}
+						{charPos++;}
 					case -78:
 						break;
 					case 79:

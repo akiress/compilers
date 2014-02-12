@@ -17,6 +17,8 @@ import ErrorMsg.ErrorMsg;
 private int commentDepth;
 private int strings;
 private StringBuffer string;
+private int charPos;
+private int tempCharPos;
 
 private void newline() {
   errorMsg.newline(yychar);
@@ -38,9 +40,15 @@ private java_cup.runtime.Symbol tok(int kind, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar, yychar+yylength(), value);
 }
 
+private java_cup.runtime.Symbol tok(int kind, int pos, Object value) {
+    return new java_cup.runtime.Symbol(kind, yychar-pos, yychar+yylength(), value);
+}
+
 private char print(String s) {
   int tmp = s.length();
   char newChar = s.charAt(tmp - 1);
+  charPos = s.length() + yychar;
+  System.out.println(charPos);
   return newChar;
 }
 
@@ -132,11 +140,11 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>\\\" {string.append("\"");}
 <STRING>\\\\ {string.append(yytext());}
 <STRING>\\\\ {yybegin(STRING);}
-<STRING>[$\\\n^\\] {}
+<STRING>[$\\\n^\\] {charPos++;}
 <STRING>"\^"[@A-Z\[\\\]\^_?] {int i = getControl(yytext()); string.append((char)i);}
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
-<STRING>"\"" {yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
+<STRING>"\"" {yybegin(YYINITIAL); strings--; tempCharPos = 0; return tok(sym.STRING, charPos, string.toString());}
 <STRING>. {string.append(yytext());}
 
 <STRING_IGNORE>[\n\r\f] {strings = 1;}
