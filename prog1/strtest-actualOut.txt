@@ -1,0 +1,5 @@
+STRING 7 "string"
+STRING 26 "literals go here"
+../strlit.tig::3.7: Cannot have newlines in string literals. Use '\' to continue to another line.
+../strlit.tig::3.13: Illegal character: \
+../strlit.tig::3.34: ERROR: Unclosed string.

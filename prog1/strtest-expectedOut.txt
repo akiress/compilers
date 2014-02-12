@@ -1,0 +1,7 @@
+STRING 0 "string"
+STRING 9 "literals go here"
+STRING 28 "icky foo bar"
+STRING 49 "A"
+STRING 56 "
+"
+EOF 61
