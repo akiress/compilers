@@ -15,11 +15,15 @@ let
     won't you work in test53"
     
     print "testing quotes \
-    \okay \" \\""
+    \okay \" \\\" "
 
     var a:= rectype nil
+    var b := 25
+    var c := -25
 
     print "\089 + \093"
+
+    print "\^@ + \^A"
 in
     a
 end

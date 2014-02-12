@@ -49,6 +49,18 @@ private char getASCII(String s) {
   return (char)i;
 }
 
+private int adjust(int pos, String s) {
+  int i = s.length();
+  int j = pos + i;
+  return j;
+}
+
+private int printControl(String s) {
+  int i = s.length();
+  String a = s.substring(1, i);
+  return i;
+}
+
 private ErrorMsg errorMsg;
 
 Yylex(java.io.InputStream s, ErrorMsg e) {
@@ -122,8 +134,14 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>[\n\r] {yyline++; err("Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
 <STRING>\\n {string.append("\n");}
 <STRING>\\t {string.append("\t");}
-<STRING>"\\\"" {string.append("\"");}
+<STRING>\\\" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
+<STRING>"\^"[@A-Z\[\\\]\^_?] {
+  System.out.println("CONTROL: " + yytext());
+  String ascii = yytext().substring(1, yytext().length());
+  int i = Integer.parseInt(ascii);
+  System.out.println("CONTROL: " + (char)i);
+}
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); System.out.println(i); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings--; return tok(sym.STRING, string.toString());}
