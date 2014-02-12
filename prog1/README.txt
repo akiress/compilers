@@ -18,3 +18,15 @@ Functionality Issues:
         STRING 0 "string"
       but is actually returning
         STRING 7 "string"
+
+About:
+      Everything other than the above listed functionality
+    issue(s) should work as expected (or as demonstrated 
+    via testing against the reference implementation).
+      Comments, strings, and control characters are handled
+    using a variety of regular expressions and starting
+    characters to react as desired.
+      Overall, our implementation was largely based off of
+    the sample code provided on the course website (modified
+    as needed) and the advice given in class and via email.
+
