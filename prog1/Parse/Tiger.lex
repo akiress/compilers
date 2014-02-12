@@ -134,17 +134,16 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <YYINITIAL>[0-9]+ {return tok(sym.INT, new Integer(yytext()));}
 
 <YYINITIAL>"\"" {string = new StringBuffer(); strings++; yybegin(STRING);}
-<STRING>[\n\r] {yyline++; err("Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
 <STRING>\\n {string.append("\n");}
 <STRING>\\t {string.append("\t");}
 <STRING>\\\" {string.append("\"");}
-<STRING>\\\\ {string.append(yytext());}
-<STRING>\\\\ {yybegin(STRING);}
+<STRING>\\\\ {string.append("\\");}
 <STRING>[$\\\n^\\] {charPos++;}
 <STRING>"\^"[@A-Z\[\\\]\^_?] {int i = getControl(yytext()); string.append((char)i);}
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings--; tempCharPos = 0; return tok(sym.STRING, charPos, string.toString());}
+<STRING>[\n] {yyline++; err("Cannot have newlines in string literals. Use '\\' to continue to another line."); yybegin(STRING_IGNORE);}
 <STRING>. {string.append(yytext()); charPos++;}
 
 <STRING_IGNORE>[\n\r\f] {strings = 1;}
