@@ -36,6 +36,10 @@ private java_cup.runtime.Symbol tok(int kind, int pos, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar-pos, yychar+yylength(), value);
 }
 private char print(String s) {
+  for (int i = 0 ; i < s.length() ; i++) {
+    int x = (int)s.charAt(i);
+    System.out.println(x);
+  }
   int tmp = s.length();
   char newChar = s.charAt(tmp - 1);
   charPos = s.length() + yychar;
@@ -682,7 +686,7 @@ private int [][] unpackFromString(int size1, int size2, String st)
 					case -51:
 						break;
 					case 51:
-						{string.append(yytext());}
+						{string.append(yytext()); charPos++;}
 					case -52:
 						break;
 					case 52:

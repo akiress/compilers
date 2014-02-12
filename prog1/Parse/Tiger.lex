@@ -145,7 +145,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
 <STRING>"\"" {yybegin(YYINITIAL); strings--; tempCharPos = 0; return tok(sym.STRING, charPos, string.toString());}
-<STRING>. {string.append(yytext());}
+<STRING>. {string.append(yytext()); charPos++;}
 
 <STRING_IGNORE>[\n\r\f] {strings = 1;}
 <STRING_IGNORE>[^\"\\\n]* {}
