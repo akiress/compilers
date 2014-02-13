@@ -1,0 +1,4 @@
+print "strings"
+print "literals go\
+\here"
+eof

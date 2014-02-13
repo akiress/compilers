@@ -33,13 +33,13 @@ private java_cup.runtime.Symbol tok(int kind, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar, yychar+yylength(), value);
 }
 private java_cup.runtime.Symbol tok(int kind, int pos, Object value) {
-    return new java_cup.runtime.Symbol(kind, yychar-pos, yychar+yylength(), value);
+    return new java_cup.runtime.Symbol(kind, yychar-charPos, yychar+yylength(), value);
 }
 private char print(String s) {
+  charPos--;
   int tmp = s.length();
   char newChar = s.charAt(tmp - 1);
-  charPos = s.length() + yychar;
-  System.out.println(charPos);
+  charPos = yychar-s.length();
   return newChar;
 }
 private char getASCII(String s) {
@@ -685,7 +685,7 @@ private int [][] unpackFromString(int size1, int size2, String st)
 					case -52:
 						break;
 					case 52:
-						{charPos++;}
+						{}
 					case -53:
 						break;
 					case 53:
@@ -781,7 +781,7 @@ private int [][] unpackFromString(int size1, int size2, String st)
 					case -76:
 						break;
 					case 77:
-						{charPos++;}
+						{}
 					case -77:
 						break;
 					case 78:

@@ -41,14 +41,12 @@ private java_cup.runtime.Symbol tok(int kind, Object value) {
 }
 
 private java_cup.runtime.Symbol tok(int kind, int pos, Object value) {
-    return new java_cup.runtime.Symbol(kind, yychar-pos, yychar+yylength(), value);
+    return new java_cup.runtime.Symbol(kind, yychar-charPos, yychar+yylength(), value);
 }
 
 private char print(String s) {
   int tmp = s.length();
   char newChar = s.charAt(tmp - 1);
-  charPos = s.length() + yychar;
-  System.out.println(charPos);
   return newChar;
 }
 
@@ -138,7 +136,7 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
 <STRING>\\t {string.append("\t");}
 <STRING>\\\" {string.append("\"");}
 <STRING>\\\\ {string.append("\\");}
-<STRING>[$\\\n^\\] {charPos++;}
+<STRING>[$\\\n^\\] {}
 <STRING>"\^"[@A-Z\[\\\]\^_?] {int i = getControl(yytext()); string.append((char)i);}
 <STRING>\\[\n|\t|\ |\f]+[^\\] {string.append(print(yytext()));}
 <STRING>\\[0-9][0-9][0-9]+ {int i = getASCII(yytext()); if (i < 256) {string.append((char)i);} else {err("ERROR: ASCII");} yybegin(STRING);}
