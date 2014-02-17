@@ -1,0 +1,123 @@
+Opening files...
+Parsing specification from standard input...
+Checking specification...
+Warning: Terminal "DIVIDE" was declared but never used
+Warning: Terminal "FUNCTION" was declared but never used
+Warning: Terminal "GE" was declared but never used
+Warning: Terminal "LPAREN" was declared but never used
+Warning: Terminal "INT" was declared but never used
+Warning: Terminal "ARRAY" was declared but never used
+Warning: Terminal "FOR" was declared but never used
+Warning: Terminal "MINUS" was declared but never used
+Warning: Terminal "RPAREN" was declared but never used
+Warning: Terminal "SEMICOLON" was declared but never used
+Warning: Terminal "AND" was declared but never used
+Warning: Terminal "LT" was declared but never used
+Warning: Terminal "TYPE" was declared but never used
+Warning: Terminal "NIL" was declared but never used
+Warning: Terminal "IN" was declared but never used
+Warning: Terminal "OR" was declared but never used
+Warning: Terminal "COMMA" was declared but never used
+Warning: Terminal "PLUS" was declared but never used
+Warning: Terminal "ASSIGN" was declared but never used
+Warning: Terminal "IF" was declared but never used
+Warning: Terminal "DOT" was declared but never used
+Warning: Terminal "LE" was declared but never used
+Warning: Terminal "OF" was declared but never used
+Warning: Terminal "NEQ" was declared but never used
+Warning: Terminal "BREAK" was declared but never used
+Warning: Terminal "EQ" was declared but never used
+Warning: Terminal "LBRACK" was declared but never used
+Warning: Terminal "TIMES" was declared but never used
+Warning: Terminal "COLON" was declared but never used
+Warning: Terminal "LBRACE" was declared but never used
+Warning: Terminal "ELSE" was declared but never used
+Warning: Terminal "RBRACK" was declared but never used
+Warning: Terminal "TO" was declared but never used
+Warning: Terminal "WHILE" was declared but never used
+Warning: Terminal "LET" was declared but never used
+Warning: Terminal "THEN" was declared but never used
+Warning: Terminal "RBRACE" was declared but never used
+Warning: Terminal "END" was declared but never used
+Warning: Terminal "STRING" was declared but never used
+Warning: Terminal "GT" was declared but never used
+Warning: Terminal "VAR" was declared but never used
+Warning: Terminal "DO" was declared but never used
+Building parse tables...
+  Computing non-terminal nullability...
+  Computing first sets...
+  Building state machine...
+  Filling in tables...
+  Checking for non-reduced productions...
+Writing parser...
+===== Terminals =====
+DIVIDE FUNCTION GE LPAREN INT 
+ARRAY FOR MINUS RPAREN SEMICOLON 
+AND LT TYPE NIL IN 
+OR COMMA PLUS ASSIGN IF 
+DOT ID LE OF EOF 
+error NEQ BREAK EQ LBRACK 
+TIMES COLON LBRACE ELSE RBRACK 
+TO WHILE LET THEN RBRACE 
+END STRING GT VAR DO 
+
+
+===== Non terminals =====
+Exp $START Var 
+
+===== Productions =====
+Var ::= ID 
+Exp ::= Var 
+Exp ::= error 
+$START ::= Exp EOF 
+
+===== Viable Prefix Recognizer =====
+START lalr_state [0]: {
+  [Exp ::= (*) Var , {EOF }]
+  [Exp ::= (*) error , {EOF }]
+  [Var ::= (*) ID , {EOF }]
+  [$START ::= (*) Exp EOF , {EOF }]
+}
+transition on Var to state [4]
+transition on Exp to state [3]
+transition on error to state [2]
+transition on ID to state [1]
+
+-------------------
+lalr_state [1]: {
+  [Var ::= ID (*) , {EOF }]
+}
+
+-------------------
+lalr_state [2]: {
+  [Exp ::= error (*) , {EOF }]
+}
+
+-------------------
+lalr_state [3]: {
+  [$START ::= Exp (*) EOF , {EOF }]
+}
+transition on EOF to state [5]
+
+-------------------
+lalr_state [4]: {
+  [Exp ::= Var (*) , {EOF }]
+}
+
+-------------------
+lalr_state [5]: {
+  [$START ::= Exp EOF (*) , {EOF }]
+}
+
+-------------------
+Closing files...
+------- CUP v0.10g Parser Generation Summary -------
+  0 errors and 42 warnings
+  45 terminals, 3 non terminals, and 4 productions declared, 
+  producing 6 unique parse states.
+  42 terminals declared but not used.
+  0 non terminals declared but not used.
+  0 productions never reduced.
+  0 conflicts detected (3 expected).
+  Code written to "Grm.java", and "sym.java".
+---------------------------------------------------- (v0.10g)
