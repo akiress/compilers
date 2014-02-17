@@ -36,10 +36,8 @@ private java_cup.runtime.Symbol tok(int kind, int pos, Object value) {
     return new java_cup.runtime.Symbol(kind, yychar-charPos, yychar+yylength(), value);
 }
 private char print(String s) {
-  charPos--;
   int tmp = s.length();
   char newChar = s.charAt(tmp - 1);
-  charPos = yychar-s.length();
   return newChar;
 }
 private char getASCII(String s) {
