@@ -1,6 +1,5 @@
 package Parse;
 
-<<<<<<< HEAD
 action code {:
   // chamada do pretty-printer
   // public Absyn.Print p = new Absyn.Print(System.out);
@@ -12,14 +11,6 @@ action code {:
 
 parser code  {: 
   public Absyn.Exp parseResult;
-=======
-action code {: static Symbol.Symbol sym(String s) {
-	         return Symbol.Symbol.symbol(s);
-	        }
-	    :};
-
-parser code  {: 
->>>>>>> 85ff09edfcf60b5eb296046c0481328fe0807531
   Lexer lexer;
 
   public void syntax_error(java_cup.runtime.Symbol current) {
@@ -28,12 +19,8 @@ parser code  {:
 
   ErrorMsg.ErrorMsg errorMsg;
 
-<<<<<<< HEAD
   public void report_error(String message, 
          java_cup.runtime.Symbol info) {
-=======
-  public void report_error(String message, java_cup.runtime.Symbol info) {
->>>>>>> 85ff09edfcf60b5eb296046c0481328fe0807531
       errorMsg.error(info.left, message);
   }
 
@@ -48,7 +35,6 @@ scan with {: return lexer.nextToken(); :};
 
 terminal String ID, STRING;
 terminal Integer INT;
-<<<<<<< HEAD
 terminal COMMA, COLON, SEMICOLON, LPAREN, RPAREN, 
   LBRACK, RBRACK, LBRACE, RBRACE, DOT, PLUS, MINUS, 
   TIMES, DIVIDE, EQ, NEQ, LT, LE, GT, GE, AND, OR, 
@@ -274,24 +260,3 @@ type ::=
     | ARRAY:arr OF ID:id
     {: RESULT = new Absyn.ArrayTy(arrleft,sym(id)); :}
     ;
-=======
-terminal COMMA, COLON, SEMICOLON, LPAREN, RPAREN, LBRACK, RBRACK, 
-	LBRACE, RBRACE, DOT, PLUS, MINUS, TIMES, DIVIDE, EQ, NEQ, LT, LE, 
-	GT, GE, AND, OR, ASSIGN, ARRAY, IF, THEN, ELSE, WHILE, FOR, TO,
-	DO, LET, IN, END, OF, BREAK, NIL, FUNCTION, VAR, TYPE;
-
-non terminal Absyn.Exp          Exp;
-non terminal Absyn.Var          Var;
-
-start with Exp;
-
-Exp ::= error:e
-	  {: RESULT = new Absyn.SeqExp(eleft, null); :}
-	| Var:v
-	  {: RESULT = new Absyn.VarExp(vleft, v); :}
-	;
-
-Var ::=   ID:n
-	  {: RESULT = new Absyn.SimpleVar(nleft, sym(n)); :}
-	;
->>>>>>> 85ff09edfcf60b5eb296046c0481328fe0807531
