@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 JFLAGS=-g
+=======
+JFLAGS=-g -Xlint
+>>>>>>> 85ff09edfcf60b5eb296046c0481328fe0807531
 
 Parse/*.class: Parse/*.java Parse/Grm.java
 	javac ${JFLAGS} Parse/*.java
