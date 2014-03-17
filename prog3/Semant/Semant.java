@@ -9,7 +9,6 @@ import java.util.Random;
 
 public class Semant {
   Env env;
-  int LOOPNUM = 0;
 
   public Semant(ErrorMsg.ErrorMsg err) {
     this(new Env(err));
@@ -92,35 +91,14 @@ public class Semant {
     }
   }
 
-  Types.RECORD transTypeFields(Absyn.FieldList l){
-    if(l==null)
-      return null;
-    Types.RECORD r=new Types.RECORD(l.name,(Type)env.tenv.get(l.typ),null);
-    Types.RECORD tmp=r;
-    for(Absyn.FieldList f=l.tail;f!=null;f=f.tail,r=r.tail)
-      r.tail=new Types.RECORD(f.name,(Type)env.tenv.get(f.typ),null);
-    return tmp;
-  }
-
-  Exp transDec(Absyn.TypeDec d) {
-    List <Symbol.Symbol> list = new ArrayList <Symbol.Symbol> ();
-    for (Absyn.TypeDec now = d; now != null; now = now.next)
-      if (list.contains(now.name))
-        Error(now.pos, "Already defined.");
-      else {
-        list.add(now.name);
-        env.tenv.put(now.name, new Types.NAME(now.name));
-      }
-    for (Absyn.TypeDec now = d; now != null; now = now.next)
-      ((Types.NAME)env.tenv.get(now.name)).bind(transTy(now.ty));
-    for (Absyn.TypeDec now = d; now != null; now = now.next)
-      if (((Types.NAME)env.tenv.get(now.name)).isLoop())
-        Error(now.pos, "Loop declaration");
+  Exp transDec(Absyn.TypeDec d){
+    if (((Types.NAME)env.tenv.get(d.name)).isLoop()) {
+      Error(d.pos, "type '"+ d.name + "' has not been defined");
+    }
     return null;
   }
   
   Exp transDec(Absyn.VarDec d) {
-    System.out.println("In VarDec");
     ExpTy init = transExp(d.init);
     Type ty = null;
     if (d.typ == null)
@@ -158,6 +136,15 @@ public class Semant {
     return null;
   }
                                                                  
+  Types.RECORD transTypeFields(Absyn.FieldList fl){
+    if (fl == null) return null;
+    Types.RECORD rec = new Types.RECORD(fl.name, (Type)env.tenv.get(fl.typ), null);
+    Types.RECORD result = rec;
+    for (Absyn.FieldList field = fl.tail; field != null; field = field.tail, rec = rec.tail)
+      rec.tail = new Types.RECORD(field.name, (Type)env.tenv.get(field.typ), null);
+    return result;
+  }
+
 //                                                                   
 //  VVVVVVVV           VVVVVVVV                                      
 //  V::::::V           V::::::V                                      
@@ -200,36 +187,30 @@ public class Semant {
     return new ExpTy(null, new Types.VOID());
   }
 
-  ExpTy transVar(Absyn.SubscriptVar v) {
-    ExpTy array = transVar(v.var);
-    if (!(array.ty.actual() instanceof Types.ARRAY)) {
-      Error(v.pos, "ARRAY needed");
-      return new ExpTy(null, VOID);
+  ExpTy transVar(Absyn.FieldVar v) {
+    ExpTy fvar = transExp(new Absyn.VarExp(v.pos, v.var));
+    if (fvar.ty instanceof Types.NAME) {
+      Types.RECORD field = (Types.RECORD)fvar.ty.actual();
+      for(;field !=  null;field = field.tail) {
+        if (field.fieldName.equals(v.field))
+          break;
+      }
+      if (field == null) env.errorMsg.error(v.pos, "'"+v.field+"' is a member of "+v.var);
+      else return new ExpTy(null, field.fieldType);
     }
-    ExpTy index = transExp(v.index);
-    checkInt(index, v.pos);
-    return new ExpTy(null, ((Types.ARRAY)array.ty).element.actual());
+    else env.errorMsg.error(v.pos,"'"+v.field+"' is not a valid field variable");
+    return new ExpTy(null, new Types.VOID());
   }
 
-  ExpTy transVar(Absyn.FieldVar v) {
-    ExpTy l = transVar(v.var);
-    int offset = 0;
-    if (l.ty instanceof Types.RECORD) {
-      Types.RECORD rec;
-      for (rec = (Types.RECORD)l.ty; rec != null; rec = rec.tail, offset++)
-        if (rec.fieldName.toString() == v.field.toString())
-          break;
-      if (rec == null) {
-        Error(v.pos, "Field " + v.field.toString() + " does not exist");
-        return new ExpTy(null, INT);
-      }
-      else
-        return new ExpTy(null, rec.fieldType.actual());
-    }
-    else {
-      Error(v.pos, "Record type required");
-      return new ExpTy(null, INT);
-    }
+  ExpTy transVar(Absyn.SubscriptVar v) {
+    ExpTy sub = transExp(new Absyn.VarExp(v.pos, v.var));
+    Type svar = sub.ty;
+    if (svar instanceof Types.NAME) svar = svar.actual();
+    if (!(svar instanceof Types.ARRAY)) env.errorMsg.error(v.pos, "The variable is not an array");
+    ExpTy p = transExp(v.index);
+    if (!(p.ty instanceof Types.INT)) env.errorMsg.error(v.pos, "The index must be an integer");
+    if (!(svar instanceof Types.ARRAY)) return  new ExpTy(null, svar);
+    else return new ExpTy(null,((Types.ARRAY)svar).element);
   }
                                                   
 //                                                  
@@ -257,59 +238,47 @@ public class Semant {
 //                                              
 
   Type transTy(Absyn.Ty e) {
-    if (e instanceof Absyn.NameTy) {
-      return transTy((Absyn.NameTy)e);
-    } else if (e instanceof Absyn.RecordTy) {
-      return transTy((Absyn.RecordTy)e);
-    } else if (e instanceof Absyn.ArrayTy) {
-      return transTy((Absyn.ArrayTy)e);
-    } else {
-      throw new Error("transTy");
-    }
+    if (e instanceof Absyn.NameTy) return transTy((Absyn.NameTy)e);
+    if (e instanceof Absyn.RecordTy) return transTy((Absyn.RecordTy)e);
+    if (e instanceof Absyn.ArrayTy) return transTy((Absyn.ArrayTy)e);
+    Error(e.pos, "Type issue.");
+    return null;
   }
   
   Type transTy(Absyn.NameTy t) {
-    Type type = (Type) (env.tenv.get(t.name));
-    if (type != null)
-      return type;
-    else {
-      Error(t.pos, "Undefined type " + t.name.toString());
-      return INT;
-    }
+    if (t == null) return new Types.VOID();
+    Type nameTy = (Type)env.tenv.get(t.name);
+    return nameTy;
   }
 
   Type transTy(Absyn.RecordTy t){
     Types.RECORD result = null, tmp = null;
-    if(env.tenv.get(t.fields.typ) == null)
-      env.errorMsg.error(t.pos, "undefined type '"+t.fields.typ+"'");
+    if (env.tenv.get(t.fields.typ) == null) Error(t.pos, "undefined type '"+t.fields.typ+"'");
     result = new Types.RECORD(t.fields.name,(Type)env.tenv.get(t.fields.typ),null);
     ArrayList<String> list = new ArrayList<String>();
     list.add(t.fields.name.toString());
     tmp = result;
     env.venv.beginScope();
-    for(Absyn.FieldList f=t.fields.tail;f!=null;f=f.tail){
-      if(list.contains(f.name.toString()))
-        env.errorMsg.error(t.pos, "feild '"+f.name+"' has been already defined");
-      else 
-        list.add(f.name.toString());
-      Type p=(Type)env.tenv.get(f.typ);
-      if(p==null)
-        env.errorMsg.error(t.pos, "undefined type '"+f.typ+"'");
-      env.venv.put(f.name, new VarEntry(p));
-      tmp.tail=new Types.RECORD(f.name,p,null);
-      tmp=tmp.tail;
+    for(Absyn.FieldList fieldList = t.fields.tail; fieldList != null; fieldList = fieldList.tail) {
+      if (list.contains(fieldList.name.toString())) Error(t.pos, "Redefinition of field " + fieldList.name);
+      else list.add(fieldList.name.toString());
+      Type p=(Type)env.tenv.get(fieldList.typ);
+      if (p==null) Error(t.pos, "undefined type '"+fieldList.typ+"'");
+      env.venv.put(fieldList.name, new VarEntry(p));
+      tmp.tail = new Types.RECORD(fieldList.name,p,null);
+      tmp = tmp.tail;
     }
     env.venv.endScope();
     return result;
   }
 
   Type transTy(Absyn.ArrayTy t) {
-    Type tType = (Type) (env.tenv.get(t.typ));
-    if (tType == null) {
+    Type type = (Type) (env.tenv.get(t.typ));
+    if (type == null) {
       Error(t.pos, "Undefined type " + t.typ.toString());
       return INT;
     }
-    return new Types.ARRAY(tType);
+    return new Types.ARRAY(type);
   }
                                                               
 //                                                                
@@ -360,94 +329,66 @@ public class Semant {
   }
 
   ExpTy transExp(Absyn.IntExp e) {
-    return new ExpTy(null, INT);
+    return new ExpTy(null, new Types.INT());
   }
 
   ExpTy transExp(Absyn.StringExp e) {
-    return new ExpTy(null, STRING);
+    return new ExpTy(null, new Types.STRING());
   }
   
   ExpTy transExp(Absyn.NilExp e) {
-    return new ExpTy(null, NIL);
+    return new ExpTy(null, new Types.NIL());
   }
   
   ExpTy transExp(Absyn.VarExp e) {
     return transVar(e.var);
   }
 
-
-  ExpTy transExp(Absyn.SeqExp e) {
-    Type type = new Types.VOID();
-    for (Absyn.ExpList list = e.list; list != null; list = list.tail) {
-      ExpTy et = transExp(list.head);
-      type = et.ty;
-    }
-
-    return new ExpTy(null, type.actual());
+  ExpTy transExp(Absyn.SeqExp e){
+    if (e == null || e.list == null) return new ExpTy(null, new Types.VOID());
+    ExpTy type = null;
+    for (Absyn.ExpList seq = e.list; seq != null; seq = seq.tail) type = transExp(seq.head);
+    return type;
   }
 
-  ExpTy transExp(Absyn.ArrayExp e) {
+  ExpTy transExp(Absyn.ArrayExp e){
+    ExpTy index = transExp(e.size);
+    System.out.println(spyFields(index));
+    if (!(index.ty instanceof Types.INT)) Error(e.pos, "Index NAN.");
     Type type = (Type)env.tenv.get(e.typ);
-    if (type == null) {
-      Error(e.pos, "Undefined array type.");
-      return new ExpTy(null, INT);
+    if (!(type instanceof Types.NAME) || !(type.actual() instanceof Types.ARRAY)){
+      Error(e.pos, "Invalid array: " + e.typ);
+      return index;
     }
-    
-    type = type.actual();
-    if (!(type instanceof Types.ARRAY)) {
-      Error(e.pos, "Array type required.");
-      return new ExpTy(null, INT);
+
+    Type arr = type;
+    if (type instanceof Types.NAME) arr = type.actual();
+    if (arr instanceof Types.ARRAY) {
+      if (!((Types.ARRAY)arr).element.coerceTo(transExp(e.init).ty))
+        Error(e.pos, "Mismatched array types.");
     }
-    
-    ExpTy arraySize = transExp(e.size);
-    checkInt(arraySize, e.size.pos);
-    
-    ExpTy init = transExp(e.init);
-    if (!(init.ty.coerceTo(((Types.ARRAY)type).element.actual())))
-       Error(e.pos, "Mismatched array types.");
-    
-    if (!init.ty.actual().coerceTo(INT)) {
-      return new ExpTy(null, type);
-    }
-    else
-      return new ExpTy(null, type);
+
+    return new ExpTy(null, arr);
   }
   
-  ExpTy transExp(Absyn.RecordExp e) {
-    Type t = (Type)env.tenv.get(e.typ);
-    if (t == null) {
-      Error(e.pos, "undefined type \"" + e.typ + "\"");
-      return new ExpTy(null, INT);
-    } else if (!(t instanceof Types.RECORD)) {
-      Error(e.pos, "\"" + e.typ + "\" is not a record type");
-      return new ExpTy(null, INT);
-    }
+  ExpTy transExp(Absyn.RecordExp e){
+    Type type = (Type)env.tenv.get(e.typ);
+    if (type instanceof Types.NAME) {
+      Types.RECORD rec = (Types.RECORD)type.actual();
+      Absyn.FieldExpList f = e.fields;
+      for(;rec != null && f != null; rec = rec.tail, f = f.tail){
+        if (!f.name.equals(rec.fieldName)) Error(e.pos, "undefined field '" + f.name+"'");
+        Type ftype = rec.fieldType;
+        if (rec.fieldType instanceof Types.NAME) ftype=((Types.NAME)rec.fieldType).actual();
+        if (!ftype.coerceTo(transExp(f.init).ty) && !(transExp(f.init).ty instanceof Types.NIL))
+          Error(e.pos, "unmatched type '" + rec.fieldName + "'");
+      }
 
-    Absyn.FieldExpList field = e.fields;
-    Types.RECORD record = (Types.RECORD)t;
-    
-    while (field != null && record != null) {
-      if (field.name != record.fieldName) {
-        Error(field.pos, "field name doesn't match");
-        return new ExpTy(null, INT);
-      }
-      
-      ExpTy et = transExp(field.init);
-      if (!et.ty.coerceTo(record.fieldType)) {
-        Error(field.init.pos, "field type doesn't match");
-        return new ExpTy(null, INT);
-      }
-      
-      field = field.tail;
-      record = record.tail;
-    }
-    
-    if (field != null || record != null) {
-      Error(e.pos, "field count doesn't match");
-      return new ExpTy(null, INT);
-    }
-    
-    return new ExpTy(null, t);
+      if (rec != null || f != null) Error(e.pos, "unmatched type");
+      return new ExpTy(null, type);
+    } else Error(e.pos, "undefined type '" + e.typ + "'");
+
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transExp(Absyn.OpExp e) {
@@ -458,164 +399,158 @@ public class Semant {
       case Absyn.OpExp.MINUS:
       case Absyn.OpExp.MUL:
       case Absyn.OpExp.DIV:
-        if (!((left.ty instanceof Types.INT) && (right.ty instanceof Types.INT)))
+        if (!(left.ty.coerceTo(INT) && right.ty.coerceTo(INT)))
           Error(e.pos, "Illegal operator. Integer required on both sides.");
-        return new ExpTy(null, INT);
+        return new ExpTy(null, new Types.INT());
       case Absyn.OpExp.EQ:
       case Absyn.OpExp.NE:
-        if (left.ty.coerceTo(INT) && right.ty.coerceTo(INT))
-          return new ExpTy(null, INT);
-        if (left.ty.coerceTo(STRING) && right.ty.coerceTo(STRING))
-          return new ExpTy(null, INT);
-        if (left.ty.coerceTo(right.ty) && right.ty.actual() instanceof Types.ARRAY)
-          return new ExpTy(null, INT);
-        if (left.ty.coerceTo(right.ty) && right.ty.actual() instanceof Types.RECORD)
-          return new ExpTy(null, INT);
-        if (left.ty.coerceTo(NIL) && right.ty.actual() instanceof Types.RECORD)
-          return new ExpTy(null, INT);
-        if (left.ty.actual() instanceof Types.RECORD && right.ty.coerceTo(NIL))
-          return new ExpTy(null, INT);
-        Error(e.left.pos, "EQ/NE Error.");
-        return new ExpTy(null, INT);
       case Absyn.OpExp.LT:
       case Absyn.OpExp.LE:
       case Absyn.OpExp.GT:
       case Absyn.OpExp.GE:
-        if ((left.ty instanceof Types.INT) && (right.ty instanceof Types.INT)) {
-          return new ExpTy(null, INT);
-        } else if ((left.ty instanceof Types.STRING) && (right.ty instanceof Types.STRING)) {
-          return new ExpTy(null, INT);
-        }
-        break;
+        if (left.ty.coerceTo(INT) && right.ty.coerceTo(INT) ||
+          (left.ty.coerceTo(STRING) && right.ty.coerceTo(STRING)) ||
+          (left.ty.coerceTo(right.ty) && right.ty.actual() instanceof Types.ARRAY) ||
+          (left.ty.coerceTo(right.ty) && right.ty.actual() instanceof Types.RECORD) ||
+          (left.ty.coerceTo(NIL) && right.ty.actual() instanceof Types.RECORD) ||
+          (left.ty.actual() instanceof Types.RECORD && right.ty.coerceTo(NIL)) ||
+          ((left.ty instanceof Types.INT) && (right.ty instanceof Types.INT)) ||
+          (left.ty instanceof Types.STRING) && (right.ty instanceof Types.STRING))
+          Error(e.pos, "Comparison between non-alike types.");
+        return new ExpTy(null, new Types.INT());
       default:
-        throw new Error("transExp.OpExp - unknown operator");
+        Error(e.pos, "Illegal operator.");
+        return new ExpTy(null, new Types.INT());
     }
-
-    return null;
   }
 
   ExpTy transExp(Absyn.AssignExp e){
-    ExpTy v=transVar(e.var);
-    ExpTy t=transExp(e.exp);
-    if(v.ty instanceof Types.NAME)
-      v.ty=v.ty.actual();
-    if(t.ty instanceof Types.NAME)
-      t.ty=t.ty.actual();
-    if(!(v.ty.coerceTo(t.ty) || (v.ty instanceof Types.RECORD && t.ty instanceof Types.NIL))){
-      String t1=t.ty.actual().toString();
-      System.out.print(t1);
-      String t2=v.ty.actual().toString();
-      Error(e.pos, "Type "+t1.substring(t1.indexOf('.')+1, t1.indexOf('@'))+
-             " can't be assigned to "+t2.substring(t2.indexOf('.')+1, t2.indexOf('@')));
+    ExpTy var = transVar(e.var);
+    if (var.ty instanceof Types.NAME) var.ty = var.ty.actual();
+    if (env.venv.get(((Absyn.SimpleVar)e.var).name) instanceof LoopVarEntry) {
+      Error(e.var.pos, "Loop variable cannot be assigned.");
+      return new ExpTy(null, new Types.VOID());
+    }
+    ExpTy exp = transExp(e.exp);
+    if (exp.ty instanceof Types.NAME) exp.ty = exp.ty.actual();
+    if (!(var.ty.coerceTo(exp.ty) || (var.ty instanceof Types.RECORD && exp.ty instanceof Types.NIL))){
+      Error(e.pos, "Type mismatch");
     }
     return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transExp(Absyn.BreakExp e) {
-    if (LOOPNUM <= 0)
-      Error(e.pos, "Break must be in loop.");
-    return new ExpTy(null, VOID);
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transExp(Absyn.CallExp e) {
-    Object o = env.venv.get(e.func);
-
-    if (o == null) {
-      Error(e.pos, "undefined function " + e.func);
-    } else if (!(o instanceof FunEntry)) {
-      Error(e.pos, e.func + " is not a function");
-    } else {
-      FunEntry f = (FunEntry)o;
-      Types.RECORD param = f.formals;
-      Absyn.ExpList arg = e.args;
-
-      while (param != null && arg != null) {
-        ExpTy et = transExp(arg.head);
-        if (!et.ty.coerceTo(param.fieldType)) {
-          Error(arg.head.pos, "transExp(Absyn.CallExp)");
-        }
-        param = param.tail;
-        arg = arg.tail;
-      }
-
-      if (param != null || arg != null) {
-        Error(e.pos, "Argument/Parameter count mismatch.");
-      }
-
-      return new ExpTy(null, f.result.actual());
+    Entry call = (Entry)env.venv.get(e.func);
+    if (call == null) {
+      Error(e.pos, "Undefined function: " + e.func);
+      return new ExpTy(null, new Types.VOID());
     }
-
-    return new ExpTy(null, INT);
+    if (call instanceof FunEntry) {
+      FunEntry func = (FunEntry)call;
+      Types.RECORD formals = func.formals;
+      Absyn.ExpList explist = e.args;
+      int index = 1;
+      for(;formals!=null && explist!=null; formals = formals.tail, explist = explist.tail)
+      {
+        ExpTy type = transExp(explist.head);
+        if (!type.ty.coerceTo(formals.fieldType))
+          Error(e.pos, "Mismatch on parameter " + index);
+        index++;
+      }
+      if (!(formals == null && explist == null)) Error(e.pos, "Function parameter mismatch.");
+      return new ExpTy(null, func.result);
+    } else {
+      Error(e.pos, "Unknown call to function.");
+      return new ExpTy(null, ((VarEntry)call).ty);
+    }
   }
 
-  ExpTy transExp(Absyn.LetExp e)
-  {
+  ExpTy transExp(Absyn.LetExp e){
     env.venv.beginScope();
     env.tenv.beginScope();
-    for ( Absyn.DecList p = e.decs; p != null; p = p.tail )
-    {
-      transDec(p.head);
+    ArrayList<String> list = new ArrayList<String>();
+    for(Absyn.DecList temp = e.decs; temp != null; temp = temp.tail) {
+      Absyn.Dec head = temp.head;
+      if (head instanceof Absyn.TypeDec){
+        Absyn.TypeDec td=(Absyn.TypeDec)head;
+        if (list.contains(td.name.toString()))
+          env.errorMsg.error(td.pos, "type '"+td.name+"' has been already defined");
+        list.add(td.name.toString());
+        env.tenv.put(td.name,new Types.NAME(td.name));
+      }
+      if (head instanceof Absyn.FunctionDec){
+        Absyn.FunctionDec fd=(Absyn.FunctionDec)head;
+        Type result = transTy(fd.result);
+        Types.RECORD rc = transTypeFields(fd.params);
+        if (list.contains(fd.name.toString()))
+          env.errorMsg.error(fd.pos, "function '"+fd.name+"' has been already defined");  
+        else{
+          list.add(fd.name.toString());
+          env.venv.put(fd.name, new FunEntry(rc,result));
+        }
+      }
     }
+    for(Absyn.DecList temp = e.decs; temp != null; temp = temp.tail) {
+      Absyn.Dec head = temp.head;
+      if (head instanceof Absyn.TypeDec) {
+        Absyn.TypeDec td=(Absyn.TypeDec)head;
+        ((Types.NAME)env.tenv.get(td.name)).bind(transTy(td.ty));
+      }
+    }
+    list.clear();
+    for(Absyn.DecList p = e.decs; p != null; p = p.tail)
+      transDec(p.head);
     ExpTy et = transExp(e.body);
-    env.tenv.endScope();
     env.venv.endScope();
-    return new ExpTy(null, et.ty.actual());
+    env.tenv.endScope();
+    if (e.body == null)
+      return new ExpTy(null, new Types.VOID());
+    return new ExpTy(null, et.ty);
   }
 
   ExpTy transExp(Absyn.IfExp e) {
-    ExpTy test = transExp(e.test);
-    ExpTy thenclause = transExp(e.thenclause);
-    ExpTy elseclause = e.elseclause == null ? null : transExp(e.elseclause);
-    if (!(test.ty instanceof Types.INT)) {
-      Error(e.test.pos, "integer expression expected");
-      return new ExpTy(null, elseclause == null ? VOID : INT);
-    }
-    if (elseclause == null) {
-      if (!(thenclause.ty instanceof Types.VOID)) {
-        Error(e.thenclause.pos, "void expression expected");
-        return new ExpTy(null, VOID);
+    ExpTy if_exp = transExp(e.test);
+    if (!(if_exp.ty instanceof Types.INT)) Error(e.pos, "The test part must return an integer");
+    ExpTy then = transExp(e.thenclause);
+    if (e.elseclause != null)
+    {
+      ExpTy else_clause = transExp(e.elseclause);
+      if (!then.ty.coerceTo(else_clause.ty)) {
+        if (!(then.ty instanceof Types.NIL || else_clause.ty instanceof Types.NIL))
+          Error(e.pos, "'if --then' expression must return same type");
       }
-      return new ExpTy(null, VOID);
-    } else {
-      if (elseclause.ty.coerceTo(thenclause.ty)) {
-        return new ExpTy(null, thenclause.ty);
-      } else if (thenclause.ty.coerceTo(elseclause.ty)) {
-        return new ExpTy(null, elseclause.ty);
-      } else {
-        Error(e.elseclause.pos, "incompatible types between then and else clause");
-        return new ExpTy(null, INT);
-      }
+      return else_clause;
     }
+    if (!(then.ty instanceof Types.VOID)) Error(e.pos, "'if --then' expression must return the type Types.VOID");
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transExp(Absyn.WhileExp e) {
-    ExpTy test = transExp(e.test);
-    checkInt(test, e.test.pos);
-    //LoopSemant ls = new LoopSemant(env);
-    LOOPNUM++;
-    ExpTy body = transExp(e.body);
-    if ( !(body.ty.actual() instanceof Types.VOID) )
-      Error(e.body.pos, "Body of WHILE cannot return any value.");
-    LOOPNUM--;
-    return new ExpTy(null, VOID);
+    ExpTy while_exp = transExp(e.test);
+    if (!(while_exp.ty instanceof Types.INT)) Error(e.pos, "The test part must return an integer");
+    ExpTy t = transExp(e.body);
+    if (!(t.ty instanceof Types.VOID)) Error(e.pos, "'while' expression must return the type Types.VOID");
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transExp(Absyn.ForExp e) {
-    ExpTy low = transExp(e.var.init);
-    checkInt(low, e.var.pos);
-    ExpTy high = transExp(e.hi);
-    checkInt(high, e.hi.pos);
     env.venv.beginScope();
-    VarEntry entry = new LoopVarEntry(INT);
-    env.venv.put(e.var.name, entry);
-    LOOPNUM++;
-    ExpTy body = transExp(e.body);
-    env.venv.endScope();
-    if ( !(body.ty.actual() instanceof Types.VOID) )
-    {
-      Error(e.body.pos, "Body of FOR cannot return any value.");
+    transDec(e.var);
+    Entry for_exp = (Entry)env.venv.get(e.var.name);
+    if (!(for_exp instanceof VarEntry)) Error(e.pos, "'"+e.var.name+"' isn't a variable");
+    else {
+      if (!(((VarEntry)for_exp).ty instanceof Types.INT))
+        Error(e.pos, "'"+e.var.name+"' must be an integer");
     }
-    LOOPNUM--;
-    return new ExpTy(null, VOID);
+    ExpTy et = transExp(e.hi);
+    if (!(et.ty instanceof Types.INT)) Error(e.pos, "An integer must follow 'to'");
+    ExpTy ey = transExp(e.body);
+    env.venv.endScope();
+    if (!(ey.ty instanceof Types.VOID)) Error(e.pos, "'for' expression must return the type Types.VOID");
+    return new ExpTy(null,new Types.VOID());
   }
 }
