@@ -26,29 +26,6 @@ public class Semant {
     env.errorMsg.error(pos, msg);
   }
 
-  public static String spyFields(Object obj) {
-    try {
-        StringBuffer buffer = new StringBuffer();
-        Field[] fields = obj.getClass().getDeclaredFields();
-        for (Field f : fields) {
-          if (!Modifier.isStatic(f.getModifiers())) {
-            f.setAccessible(true);
-            Object value = f.get(obj);
-            buffer.append(f.getType().getName());
-            buffer.append(" ");
-            buffer.append(f.getName());
-            buffer.append("=");
-            buffer.append("" + value);
-            buffer.append("\n");
-          }
-        }
-        return buffer.toString();
-      } catch (IllegalAccessException exc) {
-        System.err.println(exc);
-        return null;
-      }
-  }
-
   static final Types.VOID     VOID    = new Types.VOID();
   static final Types.INT      INT     = new Types.INT();
   static final Types.STRING   STRING  = new Types.STRING();
@@ -80,39 +57,32 @@ public class Semant {
 //
 
   Exp transDec(Absyn.Dec e) {
-    if (e instanceof Absyn.FunctionDec) {
-      return transDec((Absyn.FunctionDec)e);
-    } else if (e instanceof Absyn.VarDec) {
-      return transDec((Absyn.VarDec)e);
-    } else if (e instanceof Absyn.TypeDec) {
-      return transDec((Absyn.TypeDec)e);
-    } else {
-      throw new Error("transDec");
-    }
+    if (e instanceof Absyn.FunctionDec) return transDec((Absyn.FunctionDec)e);
+    if (e instanceof Absyn.VarDec) return transDec((Absyn.VarDec)e);
+    if (e instanceof Absyn.TypeDec) return transDec((Absyn.TypeDec)e);
+    return null;
   }
 
   Exp transDec(Absyn.TypeDec d){
     if (((Types.NAME)env.tenv.get(d.name)).isLoop()) {
-      Error(d.pos, "type '"+ d.name + "' has not been defined");
+      Error(d.pos, "No definition for " + d.name);
     }
     return null;
   }
   
   Exp transDec(Absyn.VarDec d) {
-    ExpTy init = transExp(d.init);
-    Type ty = null;
-    if (d.typ == null)
-      if (init.ty == NIL) {
-        Error(d.init.pos, "Vairiable initialization error.");
-        return null;
-      } else
-        ty = init.ty;
-    else {
-      ty = transTy(d.typ).actual();
-      if (!(init.ty.coerceTo(ty)))
-        Error(d.pos, "Type mismatches.");
+    ExpTy var = transExp(d.init);
+    if (d.typ != null) {
+      Type dec = transTy(d.typ);
+      if (dec instanceof Types.NAME) dec = dec.actual();
+      if (!var.ty.coerceTo(dec))
+        if(!((dec instanceof Types.RECORD) && var.ty instanceof Types.NIL) )
+          Error(d.pos, "Initailizing type is not matched");
+    } else {
+      if (var.ty instanceof Types.NIL) 
+        env.errorMsg.error(d.pos, "Nil initialization of " + d.name.toString());
     }
-    env.venv.put(d.name, new VarEntry(ty));
+    env.venv.put(d.name, new VarEntry(var.ty));
     return null;
   }
 
@@ -165,18 +135,15 @@ public class Semant {
 //                                                                                                                                     
 
   ExpTy transVar(Absyn.Var e) {
-    if (e instanceof Absyn.SimpleVar) {
-      return transVar((Absyn.SimpleVar)e);
-    } else if (e instanceof Absyn.FieldVar) {
-      return transVar((Absyn.FieldVar)e);
-    } else if (e instanceof Absyn.SubscriptVar) {
-      return transVar((Absyn.SubscriptVar)e);
-    } else {
-      throw new Error("Variable error.");
-    }
+    if (e instanceof Absyn.SimpleVar) return transVar((Absyn.SimpleVar)e);
+    if (e instanceof Absyn.FieldVar) return transVar((Absyn.FieldVar)e);
+    if (e instanceof Absyn.SubscriptVar) return transVar((Absyn.SubscriptVar)e);
+    Error(e.pos, "Variable error.");
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transVar(Absyn.SimpleVar v) {
+    System.out.println(v.name);
     Entry x = (Entry)env.venv.get(v.name);      
     if(x instanceof VarEntry) {
       VarEntry ent = (VarEntry)x;
@@ -353,7 +320,6 @@ public class Semant {
 
   ExpTy transExp(Absyn.ArrayExp e){
     ExpTy index = transExp(e.size);
-    System.out.println(spyFields(index));
     if (!(index.ty instanceof Types.INT)) Error(e.pos, "Index NAN.");
     Type type = (Type)env.tenv.get(e.typ);
     if (!(type instanceof Types.NAME) || !(type.actual() instanceof Types.ARRAY)){
