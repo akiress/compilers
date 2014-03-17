@@ -140,16 +140,17 @@ public class Semant {
     if (e instanceof Absyn.FieldVar) return transVar((Absyn.FieldVar)e);
     if (e instanceof Absyn.SubscriptVar) return transVar((Absyn.SubscriptVar)e);
     Error(e.pos, "Variable error.");
-    return new ExpTy(null, new Types.INT());
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transVar(Absyn.SimpleVar v) {
-    Entry x = (Entry)env.venv.get(v.name);
+    Entry x = (Entry)env.venv.get(v.name);  
     if(x instanceof VarEntry) {
       VarEntry ent = (VarEntry)x;
       return new ExpTy(null, ent.ty);
-    }
-    return new ExpTy(null, new Types.INT());
+    } //else Error(v.pos, "Error in variable " + '\"' + v.name + '\"');
+
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transVar(Absyn.FieldVar v) {
@@ -358,17 +359,12 @@ public class Semant {
   ExpTy transExp(Absyn.OpExp e) {
     ExpTy left = transExp(e.left);
     ExpTy right = transExp(e.right);
-    boolean leftINT = left.ty.coerceTo(INT);
-    boolean rightINT = right.ty.coerceTo(INT);
-    //System.out.println(leftINT);
-    //System.out.println(left.ty.actual());
-    //System.out.println(rightINT);
     switch (e.oper) {
       case Absyn.OpExp.PLUS:
       case Absyn.OpExp.MINUS:
       case Absyn.OpExp.MUL:
       case Absyn.OpExp.DIV:
-        if ((left.ty.coerceTo(INT) && right.ty.coerceTo(INT)))
+        if (!(left.ty.coerceTo(INT) && right.ty.coerceTo(INT)))
           Error(e.pos, "Illegal operator. Integer required on both sides.");
         return new ExpTy(null, new Types.INT());
       case Absyn.OpExp.EQ:
@@ -398,14 +394,14 @@ public class Semant {
     if (var.ty instanceof Types.NAME) var.ty = var.ty.actual();
     if (env.venv.get(((Absyn.SimpleVar)e.var).name) instanceof LoopVarEntry) {
       Error(e.var.pos, "Loop variable cannot be assigned.");
-      return new ExpTy(null, var.ty);
+      return new ExpTy(null, new Types.VOID());
     }
     ExpTy exp = transExp(e.exp);
     if (exp.ty instanceof Types.NAME) exp.ty = exp.ty.actual();
-    if ((var.ty.coerceTo(exp.ty))) { //|| (var.ty instanceof Types.RECORD && exp.ty instanceof Types.NIL))) {
+    if (!(var.ty.coerceTo(exp.ty) || (var.ty instanceof Types.RECORD && exp.ty instanceof Types.NIL))){
       Error(e.pos, "Type mismatch");
     }
-    return new ExpTy(null, var.ty);
+    return new ExpTy(null, new Types.VOID());
   }
 
   ExpTy transExp(Absyn.BreakExp e) {
