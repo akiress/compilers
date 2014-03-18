@@ -579,3 +579,23 @@ public class Semant
     return VOID;
   }
 }
+
+class LoopSemant extends Semant {
+  LoopSemant(Env e)
+  {
+    super(e);
+  }
+  
+  ExpTy transExp(BreakExp e)
+  {
+    return new ExpTy(null, Semant.VOID);
+  }
+}
+  
+class LoopVarEntry extends VarEntry
+{
+  LoopVarEntry(Type t)
+  {
+    super(t);
+  }
+}
