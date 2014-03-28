@@ -309,9 +309,9 @@ public class Semant {
         checkInt(lo, e.var.pos);
         ExpTy hi = transExp(e.hi);
         checkInt(hi, e.hi.pos);
-        Access acc = level.allocLocal(e.var.escape);
         env.venv.beginScope();
-        e.var.entry = new LoopVarEntry(INT);
+        Access acc = level.allocLocal(e.var.escape);
+        e.var.entry = new LoopVarEntry(acc, INT);
         env.venv.put(e.var.name, e.var.entry);
         Semant loop = new LoopSemant(env, level);
         ExpTy body = loop.transExp(e.body);
@@ -379,8 +379,8 @@ public class Semant {
             if (!init.ty.coerceTo(type))
                 error(d.pos, "assignment type mismatch");
         }
-        d.entry = new VarEntry(type);
         Access acc = level.allocLocal(d.escape);
+        d.entry = new VarEntry(acc, type);
         env.venv.put(d.name, d.entry);
         return null;
     }
@@ -429,7 +429,7 @@ public class Semant {
         // 2nd pass - handles the function bodies
         for (Absyn.FunctionDec f = d; f != null; f = f.next) {
             env.venv.beginScope();
-            putTypeFields(f.entry.formals);
+            putTypeFields(f.entry.formals, f.entry.level.formals);
             Semant fun = new Semant(env, f.entry.level);
             ExpTy body = fun.transExp(f.body);
             if (!body.ty.coerceTo(f.entry.result))
@@ -450,12 +450,12 @@ public class Semant {
         return new Types.RECORD(f.name, name, transTypeFields(hash, f.tail));
     }
 
-    private void putTypeFields (Types.RECORD f) {
-        if (f == null)
-            return;
-        env.venv.put(f.fieldName, new VarEntry(f.fieldType));
-        putTypeFields(f.tail);
-    }
+    private void putTypeFields (Types.RECORD f, AccessList a) {
+    if (f == null)
+      return;
+    env.venv.put(f.fieldName, new VarEntry(a.head, f.fieldType));
+    putTypeFields(f.tail, a.tail);
+  }
 
     Type transTy(Absyn.Ty t) {
         if (t instanceof Absyn.NameTy)

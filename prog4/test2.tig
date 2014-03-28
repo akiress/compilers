@@ -1,0 +1,6 @@
+let
+  var x := 4
+  var y := 3
+in
+  x := x + y
+end
