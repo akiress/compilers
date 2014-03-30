@@ -3,6 +3,7 @@ import Translate.Exp;
 import Types.Type;
 import java.util.Hashtable;
 import Translate.Level;
+import Symbol.Symbol;
 
 public class Semant {
   Env env;
@@ -410,7 +411,8 @@ public class Semant {
         error(f.pos, "function redeclared");
       Types.RECORD fields = transTypeFields(new Hashtable(), f.params);
       Type type = transTy(f.result);
-      f.entry = new FunEntry(fields, type);
+      Level nextLevel = new Level(level, f.name, escaped(f.params), f.leaf);
+      f.entry = new FunEntry(nextLevel, fields, type);
       env.venv.put(f.name, f.entry);
     }
     // 2nd pass - handles the function bodies
@@ -440,9 +442,11 @@ public class Semant {
   private void putTypeFields (Types.RECORD f, Translate.AccessList a) {
     if (f == null)
       return;
-    env.venv.put(f.fieldName, new VarEntry(a.head, f.fieldType));
-    putTypeFields(f.tail, a.tail);
-    return;
+    else {
+      env.venv.put(f.fieldName, new VarEntry(a.head, f.fieldType));
+      putTypeFields(f.tail, a.tail);
+      return;
+    }
   }
 
   Type transTy(Absyn.Ty t) {
