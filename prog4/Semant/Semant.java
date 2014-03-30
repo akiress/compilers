@@ -9,16 +9,18 @@ import Translate.AccessList;
 public class Semant {
     Env env;
     Level level;
+    Level current_lv;
+
     public Semant(Frame.Frame frame, ErrorMsg.ErrorMsg err) {
         this(new Env(err), new Level(frame));
     }
+
     Semant(Env e, Level l) {
         env = e;
         level = l;
     }
 
     public void transProg(Absyn.Exp exp) {
-        level = new Level(level, new Temp.Label(Symbol.Symbol.symbol("tigermain")), null);
         transExp(exp);
     }
 
@@ -40,10 +42,10 @@ public class Semant {
     private Exp checkComparable(ExpTy et, int pos) {
         Type a = et.ty.actual();
         if (!(a instanceof Types.INT
-                    || a instanceof Types.STRING
-                    || a instanceof Types.NIL
-                    || a instanceof Types.RECORD
-                    || a instanceof Types.ARRAY))
+                || a instanceof Types.STRING
+                || a instanceof Types.NIL
+                || a instanceof Types.RECORD
+                || a instanceof Types.ARRAY))
             error(pos, "integer, string, nil, record or array required");
         return et.exp;
     }
@@ -51,16 +53,10 @@ public class Semant {
     private Exp checkOrderable(ExpTy et, int pos) {
         Type a = et.ty.actual();
         if (!(a instanceof Types.INT
-                    || a instanceof Types.STRING))
+                || a instanceof Types.STRING))
             error(pos, "integer or string required");
         return et.exp;
     }
-
-    private Util.BoolList escapes(Absyn.FieldList f) {
-        if (f == null)
-          return null;
-      return new Util.BoolList(f.escape, escapes(f.tail));
-  }
 
     ExpTy transExp(Absyn.Exp e) {
         ExpTy result;
@@ -141,7 +137,7 @@ public class Semant {
                     field = field.tail) {
                 if (field.fieldName == v.field)
                     return new ExpTy(null, field.fieldType);
-                    }
+            }
             error(v.pos, "undeclared field: " + v.field);
         } else
             error(v.var.pos, "record required");
@@ -205,31 +201,31 @@ public class Semant {
         ExpTy right = transExp(e.right);
 
         switch (e.oper) {
-            case Absyn.OpExp.PLUS:
-            case Absyn.OpExp.MINUS:
-            case Absyn.OpExp.MUL:
-            case Absyn.OpExp.DIV:
-                checkInt(left, e.left.pos);
-                checkInt(right, e.right.pos);
-                return new ExpTy(null, INT);
-            case Absyn.OpExp.EQ:
-            case Absyn.OpExp.NE:
-                checkComparable(left, e.left.pos);
-                checkComparable(right, e.right.pos);
-                if (!left.ty.coerceTo(right.ty) && !right.ty.coerceTo(left.ty))
-                    error(e.pos, "incompatible operands to equality operator");
-                return new ExpTy(null, INT);
-            case Absyn.OpExp.LT:
-            case Absyn.OpExp.LE:
-            case Absyn.OpExp.GT:
-            case Absyn.OpExp.GE:
-                checkOrderable(left, e.left.pos);
-                checkOrderable(right, e.right.pos);
-                if (!left.ty.coerceTo(right.ty) && !right.ty.coerceTo(left.ty))
-                    error(e.pos, "incompatible operands to inequality operator");
-                return new ExpTy(null, INT);
-            default:
-                throw new Error("unknown operator");
+        case Absyn.OpExp.PLUS:
+        case Absyn.OpExp.MINUS:
+        case Absyn.OpExp.MUL:
+        case Absyn.OpExp.DIV:
+            checkInt(left, e.left.pos);
+            checkInt(right, e.right.pos);
+            return new ExpTy(null, INT);
+        case Absyn.OpExp.EQ:
+        case Absyn.OpExp.NE:
+            checkComparable(left, e.left.pos);
+            checkComparable(right, e.right.pos);
+            if (!left.ty.coerceTo(right.ty) && !right.ty.coerceTo(left.ty))
+                error(e.pos, "incompatible operands to equality operator");
+            return new ExpTy(null, INT);
+        case Absyn.OpExp.LT:
+        case Absyn.OpExp.LE:
+        case Absyn.OpExp.GT:
+        case Absyn.OpExp.GE:
+            checkOrderable(left, e.left.pos);
+            checkOrderable(right, e.right.pos);
+            if (!left.ty.coerceTo(right.ty) && !right.ty.coerceTo(left.ty))
+                error(e.pos, "incompatible operands to inequality operator");
+            return new ExpTy(null, INT);
+        default:
+            throw new Error("unknown operator");
         }
     }
 
@@ -309,8 +305,8 @@ public class Semant {
         checkInt(lo, e.var.pos);
         ExpTy hi = transExp(e.hi);
         checkInt(hi, e.hi.pos);
+        Translate.Access acc = level.allocLocal(e.var.escape);
         env.venv.beginScope();
-        Access acc = level.allocLocal(e.var.escape);
         e.var.entry = new LoopVarEntry(acc, INT);
         env.venv.put(e.var.name, e.var.entry);
         Semant loop = new LoopSemant(env, level);
@@ -379,8 +375,10 @@ public class Semant {
             if (!init.ty.coerceTo(type))
                 error(d.pos, "assignment type mismatch");
         }
-        Access acc = level.allocLocal(d.escape);
-        d.entry = new VarEntry(acc, type);
+        System.out.println(d.escape);
+        Translate.Access acc = level.allocLocal(d.escape);
+        System.out.println(acc);
+        //d.entry = new VarEntry(acc, type);
         env.venv.put(d.name, d.entry);
         return null;
     }
@@ -421,8 +419,7 @@ public class Semant {
                 error(f.pos, "function redeclared");
             Types.RECORD fields = transTypeFields(new Hashtable(), f.params);
             Type type = transTy(f.result);
-            Level newLevel = new Level(level, new Temp.Label(f.name), escapes(f.params), f.leaf);
-            //f.entry = new FunEntry(fields, type);
+            Level newLevel = new Level(level, f.name, escapes(f.params), f.leaf);
             f.entry = new FunEntry(newLevel, fields, type);
             env.venv.put(f.name, f.entry);
         }
@@ -439,6 +436,12 @@ public class Semant {
         return null;
     }
 
+    private Util.BoolList escapes(Absyn.FieldList f) {
+        if (f == null)
+            return null;
+        return new Util.BoolList(f.escape, escapes(f.tail));
+    }
+
     private Types.RECORD transTypeFields(Hashtable hash, Absyn.FieldList f) {
         if (f == null)
             return null;
@@ -451,11 +454,11 @@ public class Semant {
     }
 
     private void putTypeFields (Types.RECORD f, AccessList a) {
-    if (f == null)
-      return;
-    env.venv.put(f.fieldName, new VarEntry(a.head, f.fieldType));
-    putTypeFields(f.tail, a.tail);
-  }
+        if (f == null)
+            return;
+        env.venv.put(f.fieldName, new VarEntry(a.head, f.fieldType));
+        putTypeFields(f.tail, a.tail);
+    }
 
     Type transTy(Absyn.Ty t) {
         if (t instanceof Absyn.NameTy)

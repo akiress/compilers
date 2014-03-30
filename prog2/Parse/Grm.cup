@@ -65,10 +65,6 @@ start with Exp;
 
 Exp   ::= 
     error:e
-    {: RESULT = new Absyn.SeqExp(eleft, null); :}
-    | Var:v
-    {: RESULT = new Absyn.VarExp(vleft, v); :}
-    | NIL:nil
     {: RESULT = new Absyn.NilExp(nilleft); :}
     | INT:i
     {:RESULT = new Absyn.IntExp(ileft,i.intValue()); :}
@@ -122,6 +118,10 @@ Exp   ::=
     {: RESULT = new Absyn.ArrayExp(lbrackleft, sym(id),e1,e2);:}
     | LPAREN:lp ExpList:es RPAREN
     {: RESULT = new Absyn.SeqExp(lpleft,es); :}
+    {: RESULT = new Absyn.SeqExp(eleft, null); :}
+    | Var:v
+    {: RESULT = new Absyn.VarExp(vleft, v); :}
+    | NIL:nil
     ;
 
 ExpList ::= 

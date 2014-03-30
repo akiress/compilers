@@ -1,27 +1,19 @@
 package Translate;
 import Temp.Label;
-import Mips.MipsFrame;
 import Symbol.Symbol;
 import Util.BoolList;
 
 public class Level {
   Level parent;
-  Frame.Frame frame;
+  Frame.Frame frame;		// not public!
   public AccessList formals;
   public AccessList frameFormals;
-  public Level(Level parent, Label name, BoolList formals) {
+  public Level(Level parent, Symbol name, BoolList formals) {
     this(parent, name, formals, false);
   }
-  public Level(Level parent, Label name, BoolList formals, boolean leaf) {
+  public Level(Level parent, Symbol name, BoolList formals, boolean leaf) {
     this.parent = parent;
-        Label label;
-        if (name == null)
-                label = new Label();
-        else if (parent.frame.name != null)
-                label = new Label(parent.frame.name + "." + name);
-        else
-                label = name;
-    this.frame=new MipsFrame(label, new BoolList(!leaf,formals));
+    this.frame = parent.frame.newFrame(name, new BoolList(!leaf, formals));
     frameFormals = allocFormals(this.frame.formals);
     this.formals = frameFormals.tail;
   }
@@ -29,7 +21,7 @@ public class Level {
     if (formals == null)
       return null;
     return new AccessList(new Access(this, formals.head),
-                          allocFormals(formals.tail));
+			  allocFormals(formals.tail));
   }
 
   public Level(Frame.Frame f) {
@@ -41,6 +33,7 @@ public class Level {
   }
 
   public Access allocLocal(boolean escape) {
+    System.out.println(this);
     return new Access(this, frame.allocLocal(escape));
   }
 }

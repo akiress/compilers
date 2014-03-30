@@ -1,25 +1,18 @@
 package Mips;
-
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 import Symbol.Symbol;
 import Temp.Temp;
-import Temp.Label;
 import Temp.TempList;
+import Temp.Label;
 import Frame.Frame;
 import Frame.Access;
 import Frame.AccessList;
-import Temp.TempList;
 import Util.BoolList;
 
 public class MipsFrame extends Frame {
 
     private int count = 0;
-
+    private int offset = 0;
     public Frame newFrame(Symbol name, Util.BoolList formals) {
         Label label;
         if (name == null)
@@ -31,25 +24,16 @@ public class MipsFrame extends Frame {
         return new MipsFrame(label, formals);
     }
 
-    public MipsFrame() {
-        // labels in Appel's runtime.s
-    }
-
+    public MipsFrame() {}
     public MipsFrame(Label n, Util.BoolList f) {
         name = n;
         formals = allocFormals(0, f);
-
     }
 
     private static final int wordSize = 4;
-
     public int wordSize() {
         return wordSize;
     }
-
-    private static HashMap<Symbol, Integer> functions = new HashMap<Symbol, Integer>();
-
-    private int offset = 0;
 
     public Access allocLocal(boolean escape) {
         if (escape) {
@@ -292,7 +276,6 @@ public class MipsFrame extends Frame {
     }
 
     int maxArgs = 0;
-
 
     public String pre() {
         int frameSize = maxArgs * wordSize - offset + 80;
