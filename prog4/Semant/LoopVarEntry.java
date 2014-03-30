@@ -6,6 +6,6 @@ class LoopVarEntry extends VarEntry {
     }
 
     LoopVarEntry(Translate.Access a, Types.Type t) {
-        super(a, new Types.INT());
+        super(a, t);
     }
 }

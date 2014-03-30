@@ -3,9 +3,9 @@ LetExp(
   VarDec(N,
    IntExp(8)
    :INT,
-   false)
+   true)
   :INT
-  @[tigermain,t0],
+  @[tigermain,-4],
   DecList(
    TypeDec(intArray,
     ArrayTy(int))
@@ -25,12 +25,12 @@ LetExp(
       =ARRAY(
         NAME(int)
         =INT),
-     false)
+     true)
     :NAME(intArray)
      =ARRAY(
        NAME(int)
        =INT)
-    @[tigermain,t1],
+    @[tigermain,-8],
     DecList(
      VarDec(col,
       ArrayExp(intArray,
@@ -43,12 +43,12 @@ LetExp(
        =ARRAY(
          NAME(int)
          =INT),
-      false)
+      true)
      :NAME(intArray)
       =ARRAY(
         NAME(int)
         =INT)
-     @[tigermain,t2],
+     @[tigermain,-12],
      DecList(
       VarDec(diag1,
        ArrayExp(intArray,
@@ -72,12 +72,12 @@ LetExp(
         =ARRAY(
           NAME(int)
           =INT),
-       false)
+       true)
       :NAME(intArray)
        =ARRAY(
          NAME(int)
          =INT)
-      @[tigermain,t3],
+      @[tigermain,-16],
       DecList(
        VarDec(diag2,
         ArrayExp(intArray,
@@ -101,12 +101,12 @@ LetExp(
          =ARRAY(
            NAME(int)
            =INT),
-        false)
+        true)
        :NAME(intArray)
         =ARRAY(
           NAME(int)
           =INT)
-       @[tigermain,t4],
+       @[tigermain,-20],
        DecList(
         FunctionDec(printboard
          FieldList(),
@@ -118,7 +118,7 @@ LetExp(
              :INT,
              false)
             :INT
-            @[tigermain.printboard.0,t8],
+            @[tigermain.printboard.0,t1],
             OpExp(
              MINUS,
              VarExp(
@@ -135,7 +135,7 @@ LetExp(
                 :INT,
                 false)
                :INT
-               @[tigermain.printboard.0,t9],
+               @[tigermain.printboard.0,t2],
                OpExp(
                 MINUS,
                 VarExp(
@@ -211,7 +211,7 @@ LetExp(
              :INT,
              false)
             :INT
-            @[tigermain.try.1,t10],
+            @[tigermain.try.1,t3],
             OpExp(
              MINUS,
              VarExp(
@@ -423,12 +423,12 @@ LetExp(
            RECORD())
           ->VOID
          @tigermain.try.1
-          [tigermain.try.1,t6]
-          [tigermain.try.1,t7])
+          [tigermain.try.1,0]
+          [tigermain.try.1,t0])
         :()
          ->VOID
         @tigermain.printboard.0
-         [tigermain.printboard.0,t5],
+         [tigermain.printboard.0,0],
         DecList()))))))),
  CallExp(try,
   ExpList(
