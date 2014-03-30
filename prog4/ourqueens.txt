@@ -4,7 +4,8 @@ LetExp(
    IntExp(8)
    :INT,
    false)
-  :INT,
+  :INT
+  @[tigermain,t0],
   DecList(
    TypeDec(intArray,
     ArrayTy(int))
@@ -28,7 +29,8 @@ LetExp(
     :NAME(intArray)
      =ARRAY(
        NAME(int)
-       =INT),
+       =INT)
+    @[tigermain,t1],
     DecList(
      VarDec(col,
       ArrayExp(intArray,
@@ -45,7 +47,8 @@ LetExp(
      :NAME(intArray)
       =ARRAY(
         NAME(int)
-        =INT),
+        =INT)
+     @[tigermain,t2],
      DecList(
       VarDec(diag1,
        ArrayExp(intArray,
@@ -73,7 +76,8 @@ LetExp(
       :NAME(intArray)
        =ARRAY(
          NAME(int)
-         =INT),
+         =INT)
+      @[tigermain,t3],
       DecList(
        VarDec(diag2,
         ArrayExp(intArray,
@@ -101,7 +105,8 @@ LetExp(
        :NAME(intArray)
         =ARRAY(
           NAME(int)
-          =INT),
+          =INT)
+       @[tigermain,t4],
        DecList(
         FunctionDec(printboard
          FieldList(),
@@ -112,7 +117,8 @@ LetExp(
              IntExp(0)
              :INT,
              false)
-            :INT,
+            :INT
+            @[tigermain.printboard.0,t8],
             OpExp(
              MINUS,
              VarExp(
@@ -128,7 +134,8 @@ LetExp(
                 IntExp(0)
                 :INT,
                 false)
-               :INT,
+               :INT
+               @[tigermain.printboard.0,t9],
                OpExp(
                 MINUS,
                 VarExp(
@@ -203,7 +210,8 @@ LetExp(
              IntExp(0)
              :INT,
              false)
-            :INT,
+            :INT
+            @[tigermain.try.1,t10],
             OpExp(
              MINUS,
              VarExp(
@@ -413,9 +421,14 @@ LetExp(
            :NAME(int)
             =INT,
            RECORD())
-          ->VOID)
+          ->VOID
+         @tigermain.try.1
+          [tigermain.try.1,t6]
+          [tigermain.try.1,t7])
         :()
-         ->VOID,
+         ->VOID
+        @tigermain.printboard.0
+         [tigermain.printboard.0,t5],
         DecList()))))))),
  CallExp(try,
   ExpList(

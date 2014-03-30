@@ -30,7 +30,8 @@ LetExp(
     =ARRAY(
       NAME(myint)
       =NAME(int)
-       =INT),
+       =INT)
+   @[tigermain,t0],
    DecList())),
  VarExp(
   SimpleVar(arr1))

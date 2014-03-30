@@ -3,24 +3,26 @@ import Translate.Exp;
 import Types.Type;
 import java.util.Hashtable;
 import Translate.Level;
-import Translate.Access;
-import Translate.AccessList;
+import Symbol.Symbol;
 
 public class Semant {
     Env env;
     Level level;
-    Level current_lv;
-
     public Semant(Frame.Frame frame, ErrorMsg.ErrorMsg err) {
         this(new Env(err), new Level(frame));
+        level = new Level(frame);
     }
-
     Semant(Env e, Level l) {
         env = e;
         level = l;
     }
 
+    private static Symbol sym(String s) {
+        return Symbol.symbol(s);
+    }
+
     public void transProg(Absyn.Exp exp) {
+        level = new Level(level, sym("tigermain"), null);
         transExp(exp);
     }
 
@@ -305,8 +307,8 @@ public class Semant {
         checkInt(lo, e.var.pos);
         ExpTy hi = transExp(e.hi);
         checkInt(hi, e.hi.pos);
-        Translate.Access acc = level.allocLocal(e.var.escape);
         env.venv.beginScope();
+        Translate.Access acc = level.allocLocal(e.var.escape);
         e.var.entry = new LoopVarEntry(acc, INT);
         env.venv.put(e.var.name, e.var.entry);
         Semant loop = new LoopSemant(env, level);
@@ -375,10 +377,10 @@ public class Semant {
             if (!init.ty.coerceTo(type))
                 error(d.pos, "assignment type mismatch");
         }
-        System.out.println(d.escape);
         Translate.Access acc = level.allocLocal(d.escape);
-        System.out.println(acc);
-        //d.entry = new VarEntry(acc, type);
+        //System.out.println(acc);
+        d.entry = new VarEntry(acc, type);
+        //d.entry = new VarEntry(type);
         env.venv.put(d.name, d.entry);
         return null;
     }
@@ -419,8 +421,8 @@ public class Semant {
                 error(f.pos, "function redeclared");
             Types.RECORD fields = transTypeFields(new Hashtable(), f.params);
             Type type = transTy(f.result);
-            Level newLevel = new Level(level, f.name, escapes(f.params), f.leaf);
-            f.entry = new FunEntry(newLevel, fields, type);
+            Level new_level = new Level(level, f.name, escapes(f.params), f.leaf);
+            f.entry = new FunEntry(new_level, fields, type);
             env.venv.put(f.name, f.entry);
         }
         // 2nd pass - handles the function bodies
@@ -453,7 +455,7 @@ public class Semant {
         return new Types.RECORD(f.name, name, transTypeFields(hash, f.tail));
     }
 
-    private void putTypeFields (Types.RECORD f, AccessList a) {
+    private void putTypeFields (Types.RECORD f, Translate.AccessList a) {
         if (f == null)
             return;
         env.venv.put(f.fieldName, new VarEntry(a.head, f.fieldType));

@@ -33,7 +33,6 @@ public class Level {
   }
 
   public Access allocLocal(boolean escape) {
-    System.out.println(this);
     return new Access(this, frame.allocLocal(escape));
   }
 }

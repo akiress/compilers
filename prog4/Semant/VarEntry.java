@@ -8,7 +8,7 @@ public class VarEntry extends Entry {
     }
 
     VarEntry(Translate.Access a, Types.Type t) {
-        access =a;
+        access = a;
         ty = t;
     }
 }

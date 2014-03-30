@@ -1,0 +1,29 @@
+LetExp(
+ DecList(
+  FunctionDec(g
+   FieldList(
+    a,
+    int,
+    false,
+    FieldList()),
+   VarExp(
+    SimpleVar(a))
+   :NAME(int)
+    =INT,
+   FunctionDec())
+  :RECORD(
+    a
+    :NAME(int)
+     =INT,
+    RECORD())
+   ->VOID
+  @tigermain.g.0
+   [tigermain.g.0,t0]
+   [tigermain.g.0,t1],
+  DecList()),
+ CallExp(g,
+  ExpList(
+   IntExp(2)
+   :INT))
+ :VOID)
+:VOID
