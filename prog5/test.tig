@@ -1,0 +1,6 @@
+let
+    var v := 1
+    function intid (x:int) : int = x + v
+in
+    intid(5)
+end

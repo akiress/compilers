@@ -1,0 +1,23 @@
+tigermain:
+MOVE(
+ TEMP t0,
+ ESEQ(
+  MOVE(
+   MEM(
+    BINOP(PLUS,
+     TEMP t1,
+     CONST -4)),
+   CONST 1),
+  CALL(
+   NAME tigermain.intid.0,
+    TEMP t1,
+    CONST 5)))
+tigermain.intid.0:
+MOVE(
+ TEMP t0,
+ BINOP(PLUS,
+  TEMP t3,
+  MEM(
+   BINOP(PLUS,
+    TEMP t2,
+    CONST -4))))

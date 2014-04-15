@@ -1,0 +1,573 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"username",
+				"username"
+			],
+			[
+				"OSC",
+				"OscMessageBuilder"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 196.0,
+		"selected_items":
+		[
+			[
+				"format",
+				"SublimeAStyleFormatter: Format Current File"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"pretty",
+				"Pretty JSON: Reformat (Pretty Print) JSON"
+			],
+			[
+				"pre",
+				"Pretty JSON: Reformat (Pretty Print) JSON"
+			],
+			[
+				"Make",
+				"Set Syntax: Makefile Improved"
+			],
+			[
+				"json",
+				"Pretty JSON: Reformat (Pretty Print) JSON"
+			],
+			[
+				"upda",
+				"Package Control: Upgrade/Overwrite All Packages"
+			],
+			[
+				"preview",
+				"Markdown Preview: Github Flavored Markdown: Preview in Browser"
+			],
+			[
+				"mark",
+				"Markdown Preview: Python Markdown: Preview in Browser"
+			],
+			[
+				"prett",
+				"HTMLPrettify"
+			],
+			[
+				"latex",
+				"LaTeXTools: View PDF"
+			]
+		],
+		"width": 576.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read())"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/D/prog5/Translate/Translate.java",
+		"/D/prog5/Translate/Nx.java",
+		"/D/prog5/Tree/Stm.java",
+		"/D/prog5/Translate/IfThenElseExp.java",
+		"/D/prog5/test.tig",
+		"/D/prog5/prog5_ref.txt",
+		"/D/prog5/ours_ref.txt",
+		"/C/Users/Ben/AppData/Local/Temp/7zOCF1D.tmp/README-SDL.txt",
+		"/D/prog4/ourqueens.txt",
+		"/D/prog4/Semant/LoopVarEntry.java",
+		"/D/prog4/Mips/MipsFrame.java",
+		"/D/prog4/FindEscape/FindEscape.java",
+		"/D/prog4/Semant/Semant.java",
+		"/D/prog4/Absyn/VarDec.java",
+		"/C/Users/Ben/git/compilers/prog4/Morgan/Semant/Semant.java",
+		"/D/prog4/refqueens.txt",
+		"/D/prog4/Absyn/FieldList.java",
+		"/C/Users/Ben/git/compilers/prog4/Morgan/FindEscape/FindEscape.java",
+		"/C/Users/Ben/git/compilers/prog4/Morgan/Semant/VarEntry.java",
+		"/C/Users/Ben/git/compilers/prog4/Morgan/Semant/LoopVarEntry.java",
+		"/D/prog4/Temp/Label.java",
+		"/D/prog4/Semant/SemantBen.java",
+		"/D/prog4/ref2.txt",
+		"/D/prog4/our2.txt",
+		"/D/prog4/our40.txt",
+		"/D/prog4/ref40.txt",
+		"/C/Users/Ben/Downloads/Semant.java",
+		"/D/prog4/Semant/VarEntry.java",
+		"/D/prog4/Translate/Access.java",
+		"/D/prog4/Absyn/FunctionDec.java",
+		"/D/prog4/Frame/Access.java",
+		"/D/prog4/Translate/Exp.java",
+		"/C/Users/Ben/AppData/Local/Newsbin/Newsbin.nbi",
+		"/D/prog4/Translate/Level.java",
+		"/D/prog4/Mips/InFrame.java",
+		"/C/Users/Ben/Downloads/Lab4a/mips/MipsFrame.java",
+		"/C/Users/Ben/Downloads/Translate/Level.java",
+		"/C/Users/Ben/Downloads/Semant/Semant.java",
+		"/C/Users/Ben/Downloads/Semant/VarEntry.java",
+		"/C/Users/Ben/Downloads/Escapes/EscapeVisitor.java",
+		"/D/prog4/Semant/Main.java",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1395890954/macmini.net/Users/tang_viz/svn/bguitreau/mongo/populate_mongo.py",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1395890944/macmini.net/Users/tang_viz/svn/bguitreau/mongo/mongosvn.py",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1395891244/macmini.net/Users/tang_viz/svn/bguitreau/mongo/svnlog.py",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1395890933/macmini.net/Users/tang_viz/svn/bguitreau/mongo/mongo_redis.py",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1394859260/macmini.net/Users/tang_viz/svn/svnlog.py",
+		"/C/Users/Ben/svn/bguitreau/OSI_REU_2013/tempsvn.log",
+		"/C/Users/Ben/svn/bguitreau/OSI_REU_2013/parseLog.py",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1394866238/macmini.net/Users/tang_viz/svn/tempsvn.json",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1394866181/macmini.net/Users/tang_viz/svn/tempsvn.json",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1394863598/macmini.net/Users/tang_viz/svn/tempsvn.json",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1394859161/macmini.net/Users/tang_viz/svn/tempsvn.json",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1394859556/macmini.net/Users/tang_viz/svn/tempsvn.log",
+		"/C/Users/Ben/.ssh/config",
+		"/C/Users/Ben/svn/leap_osc_pi/tangviz.py",
+		"/C/Users/Ben/svn/leap_osc_pi/client.py",
+		"/C/Users/Ben/svn/leap_osc_pi/billy.py",
+		"/C/Users/Ben/svn/leap_osc_pi/mws.py",
+		"/C/Users/Ben/Downloads/NavierTokes/django.rst",
+		"/C/Users/Ben/svn/leap_osc_pi/server.py",
+		"/C/Users/Ben/svn/leap_osc_pi/reset.py",
+		"/C/Users/Ben/AppData/Local/Temp/7zO3467.tmp/41-736.txt",
+		"/C/Users/Ben/Downloads/openconnect-5.99/install-sh",
+		"/C/Users/Ben/svn/leap_osc_pi/data/members.yaml",
+		"/C/Users/Ben/Downloads/openconnect-5.99/tun-win32.c",
+		"/C/Users/Ben/svn/leap_osc_pi/svndb.py",
+		"/C/Users/Ben/svn/leap_osc_pi/LEDserver.py",
+		"/C/Users/Ben/svn/leap_osc_pi/LEDoff.py",
+		"/C/Users/Ben/svn/leap_osc_pi/LEDon.py",
+		"/C/Users/Ben/svn/leap_osc_pi/test.py",
+		"/C/Users/Ben/Desktop/utc.reg",
+		"/C/Users/Ben/svn/leap_osc_pi/update.sh",
+		"/C/Users/Ben/Downloads/OpenGL-tutorial_v0014_33/tutorial18_billboards_and_particles/tutorial18_particles.cpp",
+		"/C/Users/Ben/Documents/Visual Studio 2013/Projects/Demo1/Demo1/Demo1.cpp",
+		"/C/Users/Ben/svn/tabula.01/yaml/dc.yaml",
+		"/C/Users/Ben/svn/tabula.01/yaml/leap_osc_pi-members.yaml",
+		"/C/Users/Ben/svn/leap_osc_pi/data/blank.yaml",
+		"/C/Users/Ben/svn/leap_osc_pi/data/billy.yaml",
+		"/C/Users/Ben/svn/leap_osc_pi/data/test.yaml",
+		"/C/Users/Ben/svn/tabula.01/index.rst",
+		"/C/Users/Ben/git/school/leap_osc_pi/server.py",
+		"/C/Users/Ben/git/school/leap_osc_pi/client.py",
+		"/C/Python33/Lib/site-packages/yaml/loader.py",
+		"/C/Python33/Lib/site-packages/yaml/parser.py",
+		"/C/Python33/Lib/site-packages/yaml/nodes.py",
+		"/C/Python33/Lib/site-packages/yaml/__init__.py",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1393297803/4351.net/classes/cs4351/cs435107/prog2/Parse/Grm.cup",
+		"/C/Users/Ben/git/compilers/prog2/Parse/Grm.cup",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1393290631/4351.net/classes/cs4351/cs435107/prog2/Parse/Grm.cup",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1393103068/pi_leap.net/home/pi/proj/server.py",
+		"/C/Python33/Lib/site-packages/yaml/constructor.py",
+		"/C/Users/Ben/svn/leap_osc_pi/members.yaml",
+		"/C/Users/Ben/svn/leap_osc_pi/members.json",
+		"/C/Users/Ben/svn/tabula.01/billy/content.yaml",
+		"/C/Users/Ben/svn/leap_osc_pi/convert.cpp",
+		"/C/Users/Ben/svn/leap_osc_pi/Makefile",
+		"/C/Users/Ben/svn/leap_osc_pi/billy.json",
+		"/C/Users/Ben/svn/leap_osc_pi/billy.yaml",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1392972386/pi_leap.net/home/pi/proj/Makefile",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1392972191/pi_leap.net/home/pi/proj/convert.cpp",
+		"/C/Users/Ben/svn/leap_osc_pi/SimpleSerial.h",
+		"/C/users/ben/appdata/local/temp/sublime-sftp-browse-1392879348/pi_leap.net/home/pi/proj/convert.cpp",
+		"/C/Users/Ben/AppData/Roaming/Sublime Text 3/Packages/User/sftp_servers/pi_leap.net",
+		"/C/Users/Ben/svn/tabula.01/home.rst",
+		"/C/Users/Ben/git/compilers/hw1.md",
+		"/C/Users/Ben/Documents/oscpack_1_1_0/make.MinGW32.bat",
+		"/C/Users/Ben/svn/tabula.01/billy/svncommit_twitter_entities.md",
+		"/C/Users/Ben/svn/tabula.01/billy/svncommit_twitter_entities.rst",
+		"/C/Users/Ben/svn/tabula.01/billy/notes_02_07.rst",
+		"/C/Users/Ben/svn/tabula.01/billy/cabinets_brainstorming.rst",
+		"/C/Users/Ben/svn/tabula.01/billy/towards_weekly_meeting.rst",
+		"/C/Users/Ben/svn/leap_osc_pi/oscserver.c",
+		"/C/Users/Ben/git/compilers/prog1/str.tig",
+		"/C/Users/Ben/git/compilers/prog1/strtest.tig",
+		"/C/Users/Ben/git/compilers/prog1/testa.tig",
+		"/C/Users/Ben/git/compilers/prog1/Parse/Tiger.lex",
+		"/C/Users/Ben/git/compilers/prog1/Parse/testa.tig",
+		"/C/Users/Ben/git/compilers/pub/tiger/testcases/test53.tig",
+		"/C/Users/Ben/git/compilers/pub/tiger/testcases/test41.tig",
+		"/C/Users/Ben/git/compilers/pub/tiger/testcases/queens.tig",
+		"/C/Users/Ben/git/appgraph/2014_02_04.md",
+		"/C/Users/Ben/git/appgraph/papers/papers_of_interest.json",
+		"/C/Users/Ben/git/appgraph/papers/papers_of_interest.yaml",
+		"/C/Users/Ben/git/compilers/pub/tiger/testcases/test51.tig",
+		"/C/Users/Ben/git/compilers/pub/tiger/testcases/test50.tig",
+		"/C/Users/Ben/git/compilers/testing.dat",
+		"/C/Users/Ben/git/compilers/prog1/Parse/Yylex.java",
+		"/C/Users/Ben/svn/tabula.01/billy/notes_02_07.md"
+	],
+	"find":
+	{
+		"height": 26.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"Symbol",
+			"tiger.",
+			"println(depth)",
+			"symbol",
+			"C:\\Users\\Ben",
+			");\n",
+			"transProg",
+			"tiger.",
+			"Symbol",
+			"ExpTy",
+			"putType",
+			"FunctionDec",
+			"Dec",
+			"Translate t",
+			"ExpList",
+			"Sym",
+			"transDec",
+			"MongoTV",
+			"xmlFileOut",
+			"logfile",
+			"xmlFileIn",
+			"leap",
+			"null",
+			"curYAML",
+			"updateYAML",
+			"reader",
+			"hoursSinceLastCommit",
+			"commits",
+			"database",
+			"exp",
+			"seqTail",
+			"sequence",
+			"(Var)",
+			"(Dec)",
+			"yn. ",
+			"new",
+			",  ",
+			",",
+			", ",
+			" ",
+			"  ",
+			"optFieldExps",
+			"fieldExps",
+			"optFields",
+			"fields",
+			"nameType",
+			"type",
+			"dec",
+			"optFunctions",
+			"functionDec",
+			"optTypes",
+			"typeDec",
+			"subscriptVar",
+			"fieldVar",
+			"seqTail",
+			"sequence",
+			"optArguments",
+			"arguments",
+			"var",
+			"exp",
+			"VarExp",
+			"errormsg",
+			"server",
+			"11",
+			" ",
+			"E",
+			"D",
+			"N",
+			"L",
+			"adjust",
+			"yypos",
+			"[0-9]",
+			"lineNum = yyline + 1",
+			"lineNum, ",
+			"[0-9][0-9][0-9]",
+			" => ",
+			"stringBuilder",
+			"newLine",
+			"{digit}",
+			"{3}",
+			"newline",
+			"[\\n\\r\\f]",
+			"newline",
+			"newlineCtr",
+			"linePos",
+			"charPos",
+			"comment_text",
+			"string_text",
+			"alphabet",
+			"paperLink",
+			"ERROR",
+			" continue())",
+			"(continue())",
+			" => ",
+			"INITIAL",
+			"assert",
+			"digits",
+			"letters",
+			"err",
+			"stringBuilder",
+			"\\\\\\n",
+			"{digits}{digits}{digits}",
+			"\"\\n\" \\",
+			"ERROR:",
+			"ERROR",
+			"nonnewline_white_space",
+			"whitespace",
+			"other_whitespace",
+			"nonnewline_white_space",
+			"INITIAL",
+			"YYINITIAL",
+			"whitespace",
+			"space",
+			"stringpos",
+			"in_string",
+			"Digit",
+			"buffer",
+			"COMMENT_TEXT",
+			"STRING_TEXT",
+			"WHITE_SPACE_CHAR",
+			"NONNEWLINE_WHITE_SPACE_CHAR",
+			"DIGIT",
+			"ALPHA",
+			"whitespace",
+			"digits",
+			"alphabet",
+			"string",
+			"string_text"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"",
+			"println(\"FUCKME\")",
+			"I:\\Downloads",
+			"",
+			"fileOut",
+			"file",
+			"logFile",
+			"logfile",
+			"pi",
+			"None",
+			"cur_yaml",
+			"update_yaml",
+			"yaml_file",
+			"commitHistory",
+			"hoursSinceLastCommit",
+			"queryDB",
+			"Exp",
+			"SeqExp_Rec",
+			"SeqExp",
+			"",
+			"yn.",
+			"new Absyn.",
+			", ",
+			",",
+			"",
+			" ",
+			"FieldExp_Rec",
+			"FieldExp",
+			"Fields_Rec",
+			"Fields",
+			"NameType",
+			"Type",
+			"Dec",
+			"FunDec_Rec",
+			"FunDec",
+			"Types",
+			"TypeDec",
+			"SubScriptVar",
+			"FieldVar",
+			"SeqExp_Rec",
+			"SeqExp",
+			"Args_Rec",
+			"Args",
+			"Var",
+			"Exp",
+			"ErrorMsg",
+			"",
+			"0 | [1-9]",
+			"[eE] [+-]? 0 | [1-9]+",
+			"0 | [1-9]",
+			"[1-9]",
+			"0 | ( N D* )",
+			"yychar",
+			"{digit}",
+			"yyline++",
+			"",
+			"{digit}",
+			"",
+			"string",
+			"newline",
+			"[0-9]",
+			"{digit}{digit}",
+			"newLine",
+			"[\\n\\r]",
+			"counter",
+			"([^/*\\n]|[^*\\n]\"/\"[^*\\n]|[^/\\n]\"*\"[^/\\n]|\"*\"[^/\\n]|\"/\"[^*\\n])*",
+			"[^\\\"\\\\\\n]*",
+			"[a-zA-Z]",
+			"link",
+			")",
+			"",
+			"YYINITIAL",
+			"assup",
+			"digit",
+			"letter",
+			"string",
+			"[0-9]+",
+			"\" \\ echo \"\\n\" \\",
+			"whitespace",
+			"newline",
+			"whitespace",
+			"other_whitespace",
+			"YYINITIAL",
+			"INITIAL",
+			"space",
+			"strings",
+			"digit",
+			"text",
+			"comment_text",
+			"string_text",
+			"whitespace",
+			"nonnewline_white_space",
+			"digits",
+			"alphabet",
+			"NONNEWLINE_WHITE_SPACE_CHAR",
+			"DIGIT",
+			"ALPHA",
+			"text",
+			"alphabet",
+			"",
+			"\n",
+			"0"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 34.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.sftp":
+	{
+		"height": 118.0
+	},
+	"project": "prog5.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
