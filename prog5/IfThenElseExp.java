@@ -46,9 +46,7 @@ class IfThenElseExp extends Exp {
       return new SEQ(condStm, new SEQ(new LABEL(f), bStm));
     if (bStm == null)
       return new SEQ(condStm, new SEQ(new LABEL(t), aStm));
-    return new SEQ(condStm,
-			new SEQ(new SEQ(new LABEL(t), aStm),
-				     new SEQ(new LABEL(f), bStm)));
+    return new SEQ(condStm, new SEQ(new SEQ(new LABEL(t), aStm), new SEQ(new LABEL(f), bStm)));
   }
 
   Tree.Exp unEx() {
