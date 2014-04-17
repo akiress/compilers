@@ -128,12 +128,12 @@ public class Translate {
   private java.util.Hashtable strings = new java.util.Hashtable();
   
   public Exp StringExp(String lit) {
-    String u = lit.intern();
-    Label lab = (Label)strings.get(u);
+    String string = lit.intern();
+    Label lab = (Label)strings.get(string);
     if (lab == null) {
       lab = new Label();
-      strings.put(u, lab);
-      DataFrag frag = new DataFrag(frame.string(lab, u));
+      strings.put(string, lab);
+      DataFrag frag = new DataFrag(frame.string(lab, string));
       frag.next = frags;
       frags = frag;
     }
@@ -169,7 +169,7 @@ public class Translate {
   public Exp OpExp(int op, Exp left, Exp right) {
     if (op == 0) // \0
         return new Ex(BINOP(0, left.unEx(), right.unEx()));
-    if (op == 1) // \001 ... \007
+    if (op == 1) // \001 - \007
       return new Ex(BINOP(1, left.unEx(), right.unEx()));
     if (op == 2)
       return new Ex(BINOP(2, left.unEx(), right.unEx()));
@@ -192,7 +192,7 @@ public class Translate {
 
   public Exp StrOpExp(int op, Exp left, Exp right) {
     Tree.Exp cmp = this.frame.externalCall("strcmp", ExpList(left.unEx(), ExpList(right.unEx())));
-    if (op == 4) // \004 ... \007
+    if (op == 4) // \004 - \007
       return new RelCx(0, cmp, CONST(0));
     if (op == 5)
       return new RelCx(1, cmp, CONST(0));
@@ -225,8 +225,7 @@ private Tree.Stm startRecord(Temp r, int i, ExpList init, int wordSize)
     if (init == null) {
       return null;
     }
-    return 
-      SEQ(MOVE(MEM(BINOP(0, TEMP(r), CONST(i))), init.head.unEx()), startRecord(r, i + wordSize, init.tail, wordSize));
+    return SEQ(MOVE(MEM(BINOP(0, TEMP(r), CONST(i))), init.head.unEx()), startRecord(r, i + wordSize, init.tail, wordSize));
   }
 
   public Exp SeqExp(ExpList e) {
@@ -253,32 +252,17 @@ private Tree.Stm startRecord(Temp r, int i, ExpList init, int wordSize)
   }
 
   public Exp WhileExp(Exp test, Exp body, Label done) {
-    Label c = new Label();
-    Label b = new Label();
-    return new Nx(SEQ(SEQ(SEQ(LABEL(c), test.unCx(b, done)), 
-      SEQ(SEQ(LABEL(b), body.unNx()), JUMP(c))), 
-      LABEL(done)));
+    Label temp1 = new Label();
+    Label temp2 = new Label();
+    return new Nx(SEQ(SEQ(SEQ(LABEL(temp1), test.unCx(temp2, done)), SEQ(SEQ(LABEL(temp1), body.unNx()), JUMP(temp2))), LABEL(done)));
   }
 
   public Exp ForExp(Access i, Exp lo, Exp hi, Exp body, Label done) {
-    Label b = new Label();
-    Label inc = new Label();
-    Temp limit = new Temp();
+    Label temp = new Label();
+    Label incr = new Label();
+    Temp cap = new Temp();
     Temp home = i.home.frame.FP();
-    return new Nx(
-    
-      SEQ(
-      SEQ(SEQ(SEQ(MOVE(i.acc.exp(TEMP(home)), lo.unEx()), 
-      MOVE(TEMP(limit), hi.unEx())), 
-      CJUMP(4, i.acc.exp(TEMP(home)), TEMP(limit), b, done)), 
-      SEQ(
-      SEQ(SEQ(LABEL(b), body.unNx()), 
-      CJUMP(2, i.acc.exp(TEMP(home)), TEMP(limit), inc, done)), 
-      SEQ(SEQ(LABEL(inc), 
-      MOVE(i.acc.exp(TEMP(home)), 
-      BINOP(0, i.acc.exp(TEMP(home)), CONST(1)))), 
-      JUMP(b)))), 
-      LABEL(done)));
+    return new Nx(SEQ(SEQ(SEQ(SEQ(MOVE(i.acc.exp(TEMP(home)), lo.unEx()), MOVE(TEMP(cap), hi.unEx())), CJUMP(4, i.acc.exp(TEMP(home)), TEMP(cap), temp, done)), SEQ(SEQ(SEQ(LABEL(temp), body.unNx()), CJUMP(2, i.acc.exp(TEMP(home)), TEMP(cap), incr, done)), SEQ(SEQ(LABEL(incr), MOVE(i.acc.exp(TEMP(home)), BINOP(0, i.acc.exp(TEMP(home)), CONST(1)))), JUMP(temp)))), LABEL(done)));
   }
 
   public Exp BreakExp(Label done) {
